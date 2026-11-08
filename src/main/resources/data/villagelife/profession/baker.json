@@ -1,0 +1,76 @@
+{
+  "workstations": [
+    "minecraft:furnace"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "materials": [
+    "minecraft:wheat",
+    "minecraft:cocoa_beans",
+    "minecraft:pumpkin",
+    "minecraft:sugar",
+    "minecraft:egg"
+  ],
+  "products": [
+    "minecraft:bread",
+    "minecraft:cookie",
+    "minecraft:pumpkin_pie"
+  ],
+  "order": 90,
+  "crafts": [
+    {
+      "inputs": [
+        {
+          "item": "minecraft:wheat",
+          "count": 3
+        }
+      ],
+      "output": {
+        "item": "minecraft:bread",
+        "count": 1
+      },
+      "stock": 64,
+      "ticks": 40
+    },
+    {
+      "inputs": [
+        {
+          "item": "minecraft:wheat",
+          "count": 2
+        },
+        {
+          "item": "minecraft:cocoa_beans",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:cookie",
+        "count": 8
+      },
+      "stock": 32,
+      "ticks": 60
+    },
+    {
+      "inputs": [
+        {
+          "item": "minecraft:pumpkin",
+          "count": 1
+        },
+        {
+          "item": "minecraft:sugar",
+          "count": 1
+        },
+        {
+          "item": "#minecraft:eggs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:pumpkin_pie",
+        "count": 1
+      },
+      "stock": 16,
+      "ticks": 60
+    }
+  ]
+}

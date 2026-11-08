@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#minecraft:planks",
+    "C": "#minecraft:stone_crafting_materials",
+    "B": "minecraft:book"
+  },
+  "pattern": [
+    "PCP",
+    "CBC",
+    "PCP"
+  ],
+  "result": {
+    "id": "villagelife:village_center",
+    "count": 1
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "workstations": ["minecraft:loom"],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "tool": "minecraft:shears",
+  "materials": ["minecraft:wheat"],
+  "products": ["minecraft:white_wool", "minecraft:mutton"],
+  "nearby": ["minecraft:oak_fence"],
+  "work_area": true,
+  "order": 40
+}

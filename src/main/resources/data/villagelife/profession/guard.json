@@ -1,0 +1,14 @@
+{
+  "workstations": [
+    "minecraft:grindstone"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 32,
+  "tool": "minecraft:wooden_sword",
+  "materials": [
+    "minecraft:iron_sword",
+    "minecraft:iron_chestplate"
+  ],
+  "order": 150,
+  "defender": true
+}

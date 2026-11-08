@@ -1,0 +1,17 @@
+{
+  "workstations": [
+    "minecraft:lectern"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "products": [
+    "minecraft:oak_log",
+    "minecraft:wheat",
+    "minecraft:cod",
+    "minecraft:bread"
+  ],
+  "nearby": [
+    "minecraft:chest"
+  ],
+  "order": 110
+}

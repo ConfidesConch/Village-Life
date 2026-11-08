@@ -1,0 +1,20 @@
+{
+  "workstations": [
+    "minecraft:stonecutter"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "tool": "minecraft:stone_pickaxe",
+  "products": [
+    "minecraft:cobblestone",
+    "minecraft:coal",
+    "minecraft:raw_iron",
+    "minecraft:raw_copper",
+    "minecraft:flint"
+  ],
+  "nearby": [
+    "minecraft:stone"
+  ],
+  "work_area": true,
+  "order": 60
+}

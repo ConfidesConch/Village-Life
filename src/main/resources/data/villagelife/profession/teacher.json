@@ -1,0 +1,8 @@
+{
+  "workstations": [
+    "minecraft:bookshelf"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "order": 140
+}

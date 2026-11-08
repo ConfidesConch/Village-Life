@@ -1,0 +1,25 @@
+{
+  "workstations": [
+    "minecraft:smithing_table"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "materials": [
+    "minecraft:raw_iron",
+    "minecraft:raw_copper",
+    "minecraft:coal",
+    "minecraft:stick"
+  ],
+  "products": [
+    "minecraft:iron_pickaxe",
+    "minecraft:iron_axe",
+    "minecraft:iron_hoe",
+    "minecraft:shears",
+    "minecraft:iron_sword",
+    "minecraft:iron_ingot"
+  ],
+  "nearby": [
+    "minecraft:blast_furnace"
+  ],
+  "order": 80
+}

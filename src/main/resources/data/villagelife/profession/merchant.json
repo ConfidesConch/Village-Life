@@ -1,0 +1,14 @@
+{
+  "workstations": [
+    "minecraft:cartography_table"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "products": [
+    "minecraft:emerald"
+  ],
+  "nearby": [
+    "minecraft:chest"
+  ],
+  "order": 120
+}

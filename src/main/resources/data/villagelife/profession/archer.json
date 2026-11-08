@@ -1,0 +1,14 @@
+{
+  "workstations": [
+    "minecraft:target"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 32,
+  "tool": "minecraft:bow",
+  "materials": [
+    "minecraft:arrow",
+    "minecraft:iron_helmet"
+  ],
+  "order": 160,
+  "defender": true
+}

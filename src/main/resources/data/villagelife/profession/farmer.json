@@ -1,0 +1,11 @@
+{
+  "workstations": ["minecraft:composter"],
+  "schedule": "villagelife:default",
+  "work_radius": 12,
+  "tool": "minecraft:wooden_hoe",
+  "materials": ["minecraft:wheat_seeds"],
+  "products": ["minecraft:wheat", "minecraft:carrot", "minecraft:potato", "minecraft:beetroot"],
+  "nearby": ["minecraft:farmland", "minecraft:water_bucket"],
+  "order": 20,
+  "essential": true
+}

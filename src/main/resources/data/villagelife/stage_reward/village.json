@@ -1,0 +1,45 @@
+{
+  "stage": 1,
+  "items": [
+    {
+      "item": "minecraft:bread",
+      "count": 32
+    },
+    {
+      "item": "minecraft:cooked_beef",
+      "count": 16
+    },
+    {
+      "item": "minecraft:oak_log",
+      "count": 64
+    },
+    {
+      "item": "minecraft:cobblestone",
+      "count": 64
+    },
+    {
+      "item": "minecraft:torch",
+      "count": 32
+    },
+    {
+      "item": "minecraft:coal",
+      "count": 16
+    },
+    {
+      "item": "minecraft:iron_ingot",
+      "count": 8
+    },
+    {
+      "item": "minecraft:wheat_seeds",
+      "count": 16
+    },
+    {
+      "item": "minecraft:white_bed",
+      "count": 2
+    },
+    {
+      "item": "minecraft:emerald",
+      "count": 10
+    }
+  ]
+}

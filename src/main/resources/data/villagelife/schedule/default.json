@@ -1,0 +1,7 @@
+{
+  "entries": [
+    { "from": 6, "activity": "work" },
+    { "from": 18, "activity": "leisure" },
+    { "from": 21, "activity": "sleep" }
+  ]
+}

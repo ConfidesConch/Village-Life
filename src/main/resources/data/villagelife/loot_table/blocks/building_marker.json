@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "villagelife:building_marker"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "villagelife:blocks/building_marker"
+}

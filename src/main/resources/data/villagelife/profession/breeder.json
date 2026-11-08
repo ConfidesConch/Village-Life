@@ -1,0 +1,28 @@
+{
+  "workstations": [
+    "minecraft:hay_block"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "tool": "minecraft:wooden_sword",
+  "materials": [
+    "minecraft:wheat",
+    "minecraft:carrot",
+    "minecraft:wheat_seeds",
+    "minecraft:bucket"
+  ],
+  "products": [
+    "minecraft:beef",
+    "minecraft:leather",
+    "minecraft:porkchop",
+    "minecraft:chicken",
+    "minecraft:egg",
+    "minecraft:feather",
+    "minecraft:milk_bucket"
+  ],
+  "nearby": [
+    "minecraft:oak_fence"
+  ],
+  "work_area": true,
+  "order": 50
+}

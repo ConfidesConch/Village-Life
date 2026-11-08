@@ -1,0 +1,11 @@
+{
+  "workstations": ["minecraft:crafting_table"],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "tool": "minecraft:wooden_axe",
+  "materials": ["minecraft:oak_sapling"],
+  "products": ["minecraft:oak_log", "minecraft:oak_sapling", "minecraft:stick", "minecraft:apple"],
+  "nearby": ["minecraft:oak_log"],
+  "order": 10,
+  "essential": true
+}

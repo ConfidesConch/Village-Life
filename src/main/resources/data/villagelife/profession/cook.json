@@ -1,0 +1,24 @@
+{
+  "workstations": [
+    "minecraft:smoker"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "tool": "minecraft:bowl",
+  "materials": [
+    "minecraft:beef",
+    "minecraft:cod",
+    "minecraft:potato",
+    "minecraft:coal",
+    "minecraft:oak_log"
+  ],
+  "products": [
+    "minecraft:cooked_beef",
+    "minecraft:cooked_porkchop",
+    "minecraft:cooked_chicken",
+    "minecraft:cooked_cod",
+    "minecraft:baked_potato"
+  ],
+  "order": 70,
+  "essential": true
+}

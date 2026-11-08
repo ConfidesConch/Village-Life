@@ -1,0 +1,10 @@
+{
+  "workstations": ["minecraft:barrel"],
+  "schedule": "villagelife:default",
+  "work_radius": 16,
+  "tool": "minecraft:fishing_rod",
+  "products": ["minecraft:cod", "minecraft:salmon", "minecraft:pufferfish", "minecraft:tropical_fish"],
+  "nearby": ["minecraft:water_bucket"],
+  "order": 30,
+  "essential": true
+}

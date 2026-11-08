@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#minecraft:planks",
+    "minecraft:stick",
+    "minecraft:paper"
+  ],
+  "result": {
+    "id": "villagelife:building_marker",
+    "count": 2
+  }
+}

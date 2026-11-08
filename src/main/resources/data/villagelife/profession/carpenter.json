@@ -1,0 +1,206 @@
+{
+  "workstations": [
+    "minecraft:fletching_table"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "materials": [
+    "minecraft:oak_log",
+    "minecraft:white_wool"
+  ],
+  "products": [
+    "minecraft:oak_planks",
+    "minecraft:stick",
+    "minecraft:chest",
+    "minecraft:white_bed"
+  ],
+  "order": 100,
+  "crafts": [
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:oak_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:oak_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:spruce_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:spruce_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:birch_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:birch_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:jungle_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:jungle_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:acacia_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:acacia_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:dark_oak_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:dark_oak_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:mangrove_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:mangrove_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:cherry_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:cherry_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:pale_oak_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:pale_oak_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:poplar_logs",
+          "count": 1
+        }
+      ],
+      "output": {
+        "item": "minecraft:poplar_planks",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 30
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:planks",
+          "count": 2
+        }
+      ],
+      "output": {
+        "item": "minecraft:stick",
+        "count": 4
+      },
+      "stock": 32,
+      "ticks": 20
+    },
+    {
+      "inputs": [
+        {
+          "item": "#minecraft:planks",
+          "count": 8
+        }
+      ],
+      "output": {
+        "item": "minecraft:chest",
+        "count": 1
+      },
+      "stock": 4,
+      "ticks": 60
+    },
+    {
+      "inputs": [
+        {
+          "item": "minecraft:white_wool",
+          "count": 3
+        },
+        {
+          "item": "#minecraft:planks",
+          "count": 3
+        }
+      ],
+      "output": {
+        "item": "minecraft:white_bed",
+        "count": 1
+      },
+      "stock": 4,
+      "ticks": 80
+    }
+  ]
+}

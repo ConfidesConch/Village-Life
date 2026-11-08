@@ -1,0 +1,664 @@
+{
+  "variants": {
+    "facing=north,symbol=house,valid=false": {
+      "model": "villagelife:block/marker_house"
+    },
+    "facing=east,symbol=house,valid=false": {
+      "model": "villagelife:block/marker_house",
+      "y": 90
+    },
+    "facing=south,symbol=house,valid=false": {
+      "model": "villagelife:block/marker_house",
+      "y": 180
+    },
+    "facing=west,symbol=house,valid=false": {
+      "model": "villagelife:block/marker_house",
+      "y": 270
+    },
+    "facing=north,symbol=house,valid=true": {
+      "model": "villagelife:block/marker_house_valid"
+    },
+    "facing=east,symbol=house,valid=true": {
+      "model": "villagelife:block/marker_house_valid",
+      "y": 90
+    },
+    "facing=south,symbol=house,valid=true": {
+      "model": "villagelife:block/marker_house_valid",
+      "y": 180
+    },
+    "facing=west,symbol=house,valid=true": {
+      "model": "villagelife:block/marker_house_valid",
+      "y": 270
+    },
+    "facing=north,symbol=storage,valid=false": {
+      "model": "villagelife:block/marker_storage"
+    },
+    "facing=east,symbol=storage,valid=false": {
+      "model": "villagelife:block/marker_storage",
+      "y": 90
+    },
+    "facing=south,symbol=storage,valid=false": {
+      "model": "villagelife:block/marker_storage",
+      "y": 180
+    },
+    "facing=west,symbol=storage,valid=false": {
+      "model": "villagelife:block/marker_storage",
+      "y": 270
+    },
+    "facing=north,symbol=storage,valid=true": {
+      "model": "villagelife:block/marker_storage_valid"
+    },
+    "facing=east,symbol=storage,valid=true": {
+      "model": "villagelife:block/marker_storage_valid",
+      "y": 90
+    },
+    "facing=south,symbol=storage,valid=true": {
+      "model": "villagelife:block/marker_storage_valid",
+      "y": 180
+    },
+    "facing=west,symbol=storage,valid=true": {
+      "model": "villagelife:block/marker_storage_valid",
+      "y": 270
+    },
+    "facing=north,symbol=workplace,valid=false": {
+      "model": "villagelife:block/marker_workplace"
+    },
+    "facing=east,symbol=workplace,valid=false": {
+      "model": "villagelife:block/marker_workplace",
+      "y": 90
+    },
+    "facing=south,symbol=workplace,valid=false": {
+      "model": "villagelife:block/marker_workplace",
+      "y": 180
+    },
+    "facing=west,symbol=workplace,valid=false": {
+      "model": "villagelife:block/marker_workplace",
+      "y": 270
+    },
+    "facing=north,symbol=workplace,valid=true": {
+      "model": "villagelife:block/marker_workplace_valid"
+    },
+    "facing=east,symbol=workplace,valid=true": {
+      "model": "villagelife:block/marker_workplace_valid",
+      "y": 90
+    },
+    "facing=south,symbol=workplace,valid=true": {
+      "model": "villagelife:block/marker_workplace_valid",
+      "y": 180
+    },
+    "facing=west,symbol=workplace,valid=true": {
+      "model": "villagelife:block/marker_workplace_valid",
+      "y": 270
+    },
+    "facing=north,symbol=lumberjack,valid=false": {
+      "model": "villagelife:block/marker_lumberjack"
+    },
+    "facing=east,symbol=lumberjack,valid=false": {
+      "model": "villagelife:block/marker_lumberjack",
+      "y": 90
+    },
+    "facing=south,symbol=lumberjack,valid=false": {
+      "model": "villagelife:block/marker_lumberjack",
+      "y": 180
+    },
+    "facing=west,symbol=lumberjack,valid=false": {
+      "model": "villagelife:block/marker_lumberjack",
+      "y": 270
+    },
+    "facing=north,symbol=lumberjack,valid=true": {
+      "model": "villagelife:block/marker_lumberjack_valid"
+    },
+    "facing=east,symbol=lumberjack,valid=true": {
+      "model": "villagelife:block/marker_lumberjack_valid",
+      "y": 90
+    },
+    "facing=south,symbol=lumberjack,valid=true": {
+      "model": "villagelife:block/marker_lumberjack_valid",
+      "y": 180
+    },
+    "facing=west,symbol=lumberjack,valid=true": {
+      "model": "villagelife:block/marker_lumberjack_valid",
+      "y": 270
+    },
+    "facing=north,symbol=farmer,valid=false": {
+      "model": "villagelife:block/marker_farmer"
+    },
+    "facing=east,symbol=farmer,valid=false": {
+      "model": "villagelife:block/marker_farmer",
+      "y": 90
+    },
+    "facing=south,symbol=farmer,valid=false": {
+      "model": "villagelife:block/marker_farmer",
+      "y": 180
+    },
+    "facing=west,symbol=farmer,valid=false": {
+      "model": "villagelife:block/marker_farmer",
+      "y": 270
+    },
+    "facing=north,symbol=farmer,valid=true": {
+      "model": "villagelife:block/marker_farmer_valid"
+    },
+    "facing=east,symbol=farmer,valid=true": {
+      "model": "villagelife:block/marker_farmer_valid",
+      "y": 90
+    },
+    "facing=south,symbol=farmer,valid=true": {
+      "model": "villagelife:block/marker_farmer_valid",
+      "y": 180
+    },
+    "facing=west,symbol=farmer,valid=true": {
+      "model": "villagelife:block/marker_farmer_valid",
+      "y": 270
+    },
+    "facing=north,symbol=fisherman,valid=false": {
+      "model": "villagelife:block/marker_fisherman"
+    },
+    "facing=east,symbol=fisherman,valid=false": {
+      "model": "villagelife:block/marker_fisherman",
+      "y": 90
+    },
+    "facing=south,symbol=fisherman,valid=false": {
+      "model": "villagelife:block/marker_fisherman",
+      "y": 180
+    },
+    "facing=west,symbol=fisherman,valid=false": {
+      "model": "villagelife:block/marker_fisherman",
+      "y": 270
+    },
+    "facing=north,symbol=fisherman,valid=true": {
+      "model": "villagelife:block/marker_fisherman_valid"
+    },
+    "facing=east,symbol=fisherman,valid=true": {
+      "model": "villagelife:block/marker_fisherman_valid",
+      "y": 90
+    },
+    "facing=south,symbol=fisherman,valid=true": {
+      "model": "villagelife:block/marker_fisherman_valid",
+      "y": 180
+    },
+    "facing=west,symbol=fisherman,valid=true": {
+      "model": "villagelife:block/marker_fisherman_valid",
+      "y": 270
+    },
+    "facing=north,symbol=shepherd,valid=false": {
+      "model": "villagelife:block/marker_shepherd"
+    },
+    "facing=east,symbol=shepherd,valid=false": {
+      "model": "villagelife:block/marker_shepherd",
+      "y": 90
+    },
+    "facing=south,symbol=shepherd,valid=false": {
+      "model": "villagelife:block/marker_shepherd",
+      "y": 180
+    },
+    "facing=west,symbol=shepherd,valid=false": {
+      "model": "villagelife:block/marker_shepherd",
+      "y": 270
+    },
+    "facing=north,symbol=shepherd,valid=true": {
+      "model": "villagelife:block/marker_shepherd_valid"
+    },
+    "facing=east,symbol=shepherd,valid=true": {
+      "model": "villagelife:block/marker_shepherd_valid",
+      "y": 90
+    },
+    "facing=south,symbol=shepherd,valid=true": {
+      "model": "villagelife:block/marker_shepherd_valid",
+      "y": 180
+    },
+    "facing=west,symbol=shepherd,valid=true": {
+      "model": "villagelife:block/marker_shepherd_valid",
+      "y": 270
+    },
+    "facing=north,symbol=breeder,valid=false": {
+      "model": "villagelife:block/marker_breeder"
+    },
+    "facing=east,symbol=breeder,valid=false": {
+      "model": "villagelife:block/marker_breeder",
+      "y": 90
+    },
+    "facing=south,symbol=breeder,valid=false": {
+      "model": "villagelife:block/marker_breeder",
+      "y": 180
+    },
+    "facing=west,symbol=breeder,valid=false": {
+      "model": "villagelife:block/marker_breeder",
+      "y": 270
+    },
+    "facing=north,symbol=breeder,valid=true": {
+      "model": "villagelife:block/marker_breeder_valid"
+    },
+    "facing=east,symbol=breeder,valid=true": {
+      "model": "villagelife:block/marker_breeder_valid",
+      "y": 90
+    },
+    "facing=south,symbol=breeder,valid=true": {
+      "model": "villagelife:block/marker_breeder_valid",
+      "y": 180
+    },
+    "facing=west,symbol=breeder,valid=true": {
+      "model": "villagelife:block/marker_breeder_valid",
+      "y": 270
+    },
+    "facing=north,symbol=miner,valid=false": {
+      "model": "villagelife:block/marker_miner"
+    },
+    "facing=east,symbol=miner,valid=false": {
+      "model": "villagelife:block/marker_miner",
+      "y": 90
+    },
+    "facing=south,symbol=miner,valid=false": {
+      "model": "villagelife:block/marker_miner",
+      "y": 180
+    },
+    "facing=west,symbol=miner,valid=false": {
+      "model": "villagelife:block/marker_miner",
+      "y": 270
+    },
+    "facing=north,symbol=miner,valid=true": {
+      "model": "villagelife:block/marker_miner_valid"
+    },
+    "facing=east,symbol=miner,valid=true": {
+      "model": "villagelife:block/marker_miner_valid",
+      "y": 90
+    },
+    "facing=south,symbol=miner,valid=true": {
+      "model": "villagelife:block/marker_miner_valid",
+      "y": 180
+    },
+    "facing=west,symbol=miner,valid=true": {
+      "model": "villagelife:block/marker_miner_valid",
+      "y": 270
+    },
+    "facing=north,symbol=cook,valid=false": {
+      "model": "villagelife:block/marker_cook"
+    },
+    "facing=east,symbol=cook,valid=false": {
+      "model": "villagelife:block/marker_cook",
+      "y": 90
+    },
+    "facing=south,symbol=cook,valid=false": {
+      "model": "villagelife:block/marker_cook",
+      "y": 180
+    },
+    "facing=west,symbol=cook,valid=false": {
+      "model": "villagelife:block/marker_cook",
+      "y": 270
+    },
+    "facing=north,symbol=cook,valid=true": {
+      "model": "villagelife:block/marker_cook_valid"
+    },
+    "facing=east,symbol=cook,valid=true": {
+      "model": "villagelife:block/marker_cook_valid",
+      "y": 90
+    },
+    "facing=south,symbol=cook,valid=true": {
+      "model": "villagelife:block/marker_cook_valid",
+      "y": 180
+    },
+    "facing=west,symbol=cook,valid=true": {
+      "model": "villagelife:block/marker_cook_valid",
+      "y": 270
+    },
+    "facing=north,symbol=smith,valid=false": {
+      "model": "villagelife:block/marker_smith"
+    },
+    "facing=east,symbol=smith,valid=false": {
+      "model": "villagelife:block/marker_smith",
+      "y": 90
+    },
+    "facing=south,symbol=smith,valid=false": {
+      "model": "villagelife:block/marker_smith",
+      "y": 180
+    },
+    "facing=west,symbol=smith,valid=false": {
+      "model": "villagelife:block/marker_smith",
+      "y": 270
+    },
+    "facing=north,symbol=smith,valid=true": {
+      "model": "villagelife:block/marker_smith_valid"
+    },
+    "facing=east,symbol=smith,valid=true": {
+      "model": "villagelife:block/marker_smith_valid",
+      "y": 90
+    },
+    "facing=south,symbol=smith,valid=true": {
+      "model": "villagelife:block/marker_smith_valid",
+      "y": 180
+    },
+    "facing=west,symbol=smith,valid=true": {
+      "model": "villagelife:block/marker_smith_valid",
+      "y": 270
+    },
+    "facing=north,symbol=baker,valid=false": {
+      "model": "villagelife:block/marker_baker"
+    },
+    "facing=east,symbol=baker,valid=false": {
+      "model": "villagelife:block/marker_baker",
+      "y": 90
+    },
+    "facing=south,symbol=baker,valid=false": {
+      "model": "villagelife:block/marker_baker",
+      "y": 180
+    },
+    "facing=west,symbol=baker,valid=false": {
+      "model": "villagelife:block/marker_baker",
+      "y": 270
+    },
+    "facing=north,symbol=baker,valid=true": {
+      "model": "villagelife:block/marker_baker_valid"
+    },
+    "facing=east,symbol=baker,valid=true": {
+      "model": "villagelife:block/marker_baker_valid",
+      "y": 90
+    },
+    "facing=south,symbol=baker,valid=true": {
+      "model": "villagelife:block/marker_baker_valid",
+      "y": 180
+    },
+    "facing=west,symbol=baker,valid=true": {
+      "model": "villagelife:block/marker_baker_valid",
+      "y": 270
+    },
+    "facing=north,symbol=carpenter,valid=false": {
+      "model": "villagelife:block/marker_carpenter"
+    },
+    "facing=east,symbol=carpenter,valid=false": {
+      "model": "villagelife:block/marker_carpenter",
+      "y": 90
+    },
+    "facing=south,symbol=carpenter,valid=false": {
+      "model": "villagelife:block/marker_carpenter",
+      "y": 180
+    },
+    "facing=west,symbol=carpenter,valid=false": {
+      "model": "villagelife:block/marker_carpenter",
+      "y": 270
+    },
+    "facing=north,symbol=carpenter,valid=true": {
+      "model": "villagelife:block/marker_carpenter_valid"
+    },
+    "facing=east,symbol=carpenter,valid=true": {
+      "model": "villagelife:block/marker_carpenter_valid",
+      "y": 90
+    },
+    "facing=south,symbol=carpenter,valid=true": {
+      "model": "villagelife:block/marker_carpenter_valid",
+      "y": 180
+    },
+    "facing=west,symbol=carpenter,valid=true": {
+      "model": "villagelife:block/marker_carpenter_valid",
+      "y": 270
+    },
+    "facing=north,symbol=storekeeper,valid=false": {
+      "model": "villagelife:block/marker_storekeeper"
+    },
+    "facing=east,symbol=storekeeper,valid=false": {
+      "model": "villagelife:block/marker_storekeeper",
+      "y": 90
+    },
+    "facing=south,symbol=storekeeper,valid=false": {
+      "model": "villagelife:block/marker_storekeeper",
+      "y": 180
+    },
+    "facing=west,symbol=storekeeper,valid=false": {
+      "model": "villagelife:block/marker_storekeeper",
+      "y": 270
+    },
+    "facing=north,symbol=storekeeper,valid=true": {
+      "model": "villagelife:block/marker_storekeeper_valid"
+    },
+    "facing=east,symbol=storekeeper,valid=true": {
+      "model": "villagelife:block/marker_storekeeper_valid",
+      "y": 90
+    },
+    "facing=south,symbol=storekeeper,valid=true": {
+      "model": "villagelife:block/marker_storekeeper_valid",
+      "y": 180
+    },
+    "facing=west,symbol=storekeeper,valid=true": {
+      "model": "villagelife:block/marker_storekeeper_valid",
+      "y": 270
+    },
+    "facing=north,symbol=merchant,valid=false": {
+      "model": "villagelife:block/marker_merchant"
+    },
+    "facing=east,symbol=merchant,valid=false": {
+      "model": "villagelife:block/marker_merchant",
+      "y": 90
+    },
+    "facing=south,symbol=merchant,valid=false": {
+      "model": "villagelife:block/marker_merchant",
+      "y": 180
+    },
+    "facing=west,symbol=merchant,valid=false": {
+      "model": "villagelife:block/marker_merchant",
+      "y": 270
+    },
+    "facing=north,symbol=merchant,valid=true": {
+      "model": "villagelife:block/marker_merchant_valid"
+    },
+    "facing=east,symbol=merchant,valid=true": {
+      "model": "villagelife:block/marker_merchant_valid",
+      "y": 90
+    },
+    "facing=south,symbol=merchant,valid=true": {
+      "model": "villagelife:block/marker_merchant_valid",
+      "y": 180
+    },
+    "facing=west,symbol=merchant,valid=true": {
+      "model": "villagelife:block/marker_merchant_valid",
+      "y": 270
+    },
+    "facing=north,symbol=innkeeper,valid=false": {
+      "model": "villagelife:block/marker_innkeeper"
+    },
+    "facing=east,symbol=innkeeper,valid=false": {
+      "model": "villagelife:block/marker_innkeeper",
+      "y": 90
+    },
+    "facing=south,symbol=innkeeper,valid=false": {
+      "model": "villagelife:block/marker_innkeeper",
+      "y": 180
+    },
+    "facing=west,symbol=innkeeper,valid=false": {
+      "model": "villagelife:block/marker_innkeeper",
+      "y": 270
+    },
+    "facing=north,symbol=innkeeper,valid=true": {
+      "model": "villagelife:block/marker_innkeeper_valid"
+    },
+    "facing=east,symbol=innkeeper,valid=true": {
+      "model": "villagelife:block/marker_innkeeper_valid",
+      "y": 90
+    },
+    "facing=south,symbol=innkeeper,valid=true": {
+      "model": "villagelife:block/marker_innkeeper_valid",
+      "y": 180
+    },
+    "facing=west,symbol=innkeeper,valid=true": {
+      "model": "villagelife:block/marker_innkeeper_valid",
+      "y": 270
+    },
+    "facing=north,symbol=teacher,valid=false": {
+      "model": "villagelife:block/marker_teacher"
+    },
+    "facing=east,symbol=teacher,valid=false": {
+      "model": "villagelife:block/marker_teacher",
+      "y": 90
+    },
+    "facing=south,symbol=teacher,valid=false": {
+      "model": "villagelife:block/marker_teacher",
+      "y": 180
+    },
+    "facing=west,symbol=teacher,valid=false": {
+      "model": "villagelife:block/marker_teacher",
+      "y": 270
+    },
+    "facing=north,symbol=teacher,valid=true": {
+      "model": "villagelife:block/marker_teacher_valid"
+    },
+    "facing=east,symbol=teacher,valid=true": {
+      "model": "villagelife:block/marker_teacher_valid",
+      "y": 90
+    },
+    "facing=south,symbol=teacher,valid=true": {
+      "model": "villagelife:block/marker_teacher_valid",
+      "y": 180
+    },
+    "facing=west,symbol=teacher,valid=true": {
+      "model": "villagelife:block/marker_teacher_valid",
+      "y": 270
+    },
+    "facing=north,symbol=guard,valid=false": {
+      "model": "villagelife:block/marker_guard"
+    },
+    "facing=east,symbol=guard,valid=false": {
+      "model": "villagelife:block/marker_guard",
+      "y": 90
+    },
+    "facing=south,symbol=guard,valid=false": {
+      "model": "villagelife:block/marker_guard",
+      "y": 180
+    },
+    "facing=west,symbol=guard,valid=false": {
+      "model": "villagelife:block/marker_guard",
+      "y": 270
+    },
+    "facing=north,symbol=guard,valid=true": {
+      "model": "villagelife:block/marker_guard_valid"
+    },
+    "facing=east,symbol=guard,valid=true": {
+      "model": "villagelife:block/marker_guard_valid",
+      "y": 90
+    },
+    "facing=south,symbol=guard,valid=true": {
+      "model": "villagelife:block/marker_guard_valid",
+      "y": 180
+    },
+    "facing=west,symbol=guard,valid=true": {
+      "model": "villagelife:block/marker_guard_valid",
+      "y": 270
+    },
+    "facing=north,symbol=archer,valid=false": {
+      "model": "villagelife:block/marker_archer"
+    },
+    "facing=east,symbol=archer,valid=false": {
+      "model": "villagelife:block/marker_archer",
+      "y": 90
+    },
+    "facing=south,symbol=archer,valid=false": {
+      "model": "villagelife:block/marker_archer",
+      "y": 180
+    },
+    "facing=west,symbol=archer,valid=false": {
+      "model": "villagelife:block/marker_archer",
+      "y": 270
+    },
+    "facing=north,symbol=archer,valid=true": {
+      "model": "villagelife:block/marker_archer_valid"
+    },
+    "facing=east,symbol=archer,valid=true": {
+      "model": "villagelife:block/marker_archer_valid",
+      "y": 90
+    },
+    "facing=south,symbol=archer,valid=true": {
+      "model": "villagelife:block/marker_archer_valid",
+      "y": 180
+    },
+    "facing=west,symbol=archer,valid=true": {
+      "model": "villagelife:block/marker_archer_valid",
+      "y": 270
+    },
+    "facing=north,symbol=captain,valid=false": {
+      "model": "villagelife:block/marker_captain"
+    },
+    "facing=east,symbol=captain,valid=false": {
+      "model": "villagelife:block/marker_captain",
+      "y": 90
+    },
+    "facing=south,symbol=captain,valid=false": {
+      "model": "villagelife:block/marker_captain",
+      "y": 180
+    },
+    "facing=west,symbol=captain,valid=false": {
+      "model": "villagelife:block/marker_captain",
+      "y": 270
+    },
+    "facing=north,symbol=captain,valid=true": {
+      "model": "villagelife:block/marker_captain_valid"
+    },
+    "facing=east,symbol=captain,valid=true": {
+      "model": "villagelife:block/marker_captain_valid",
+      "y": 90
+    },
+    "facing=south,symbol=captain,valid=true": {
+      "model": "villagelife:block/marker_captain_valid",
+      "y": 180
+    },
+    "facing=west,symbol=captain,valid=true": {
+      "model": "villagelife:block/marker_captain_valid",
+      "y": 270
+    },
+    "facing=north,symbol=field,valid=false": {
+      "model": "villagelife:block/marker_field"
+    },
+    "facing=east,symbol=field,valid=false": {
+      "model": "villagelife:block/marker_field",
+      "y": 90
+    },
+    "facing=south,symbol=field,valid=false": {
+      "model": "villagelife:block/marker_field",
+      "y": 180
+    },
+    "facing=west,symbol=field,valid=false": {
+      "model": "villagelife:block/marker_field",
+      "y": 270
+    },
+    "facing=north,symbol=field,valid=true": {
+      "model": "villagelife:block/marker_field_valid"
+    },
+    "facing=east,symbol=field,valid=true": {
+      "model": "villagelife:block/marker_field_valid",
+      "y": 90
+    },
+    "facing=south,symbol=field,valid=true": {
+      "model": "villagelife:block/marker_field_valid",
+      "y": 180
+    },
+    "facing=west,symbol=field,valid=true": {
+      "model": "villagelife:block/marker_field_valid",
+      "y": 270
+    },
+    "facing=north,symbol=pasture,valid=false": {
+      "model": "villagelife:block/marker_pasture"
+    },
+    "facing=east,symbol=pasture,valid=false": {
+      "model": "villagelife:block/marker_pasture",
+      "y": 90
+    },
+    "facing=south,symbol=pasture,valid=false": {
+      "model": "villagelife:block/marker_pasture",
+      "y": 180
+    },
+    "facing=west,symbol=pasture,valid=false": {
+      "model": "villagelife:block/marker_pasture",
+      "y": 270
+    },
+    "facing=north,symbol=pasture,valid=true": {
+      "model": "villagelife:block/marker_pasture_valid"
+    },
+    "facing=east,symbol=pasture,valid=true": {
+      "model": "villagelife:block/marker_pasture_valid",
+      "y": 90
+    },
+    "facing=south,symbol=pasture,valid=true": {
+      "model": "villagelife:block/marker_pasture_valid",
+      "y": 180
+    },
+    "facing=west,symbol=pasture,valid=true": {
+      "model": "villagelife:block/marker_pasture_valid",
+      "y": 270
+    }
+  }
+}

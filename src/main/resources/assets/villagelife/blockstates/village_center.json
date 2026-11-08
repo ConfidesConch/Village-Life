@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "villagelife:block/village_center" }
+  }
+}

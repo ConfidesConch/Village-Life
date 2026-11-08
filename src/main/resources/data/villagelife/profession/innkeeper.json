@@ -1,0 +1,11 @@
+{
+  "workstations": [
+    "minecraft:brewing_stand"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "nearby": [
+    "minecraft:chest"
+  ],
+  "order": 130
+}
