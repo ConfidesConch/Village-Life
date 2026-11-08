@@ -2,6 +2,7 @@ package io.github.confidesconch.villagelife.client;
 
 import io.github.confidesconch.villagelife.VillageLife;
 import io.github.confidesconch.villagelife.client.book.VillageBookClient;
+import io.github.confidesconch.villagelife.client.map.MapMemory;
 import io.github.confidesconch.villagelife.core.config.ClientConfig;
 
 import net.neoforged.api.distmarker.Dist;
@@ -12,7 +13,10 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.ChunkEvent;
 import io.github.confidesconch.villagelife.core.registry.ModEntities;
 
 /**
@@ -33,6 +37,24 @@ public final class VillageLifeClient {
                 net.minecraft.resources.Identifier.fromNamespaceAndPath(VillageLife.MOD_ID, "resident_skins"),
                 (net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager -> ResidentSkins.clear()));
         VillageBookClient.init(modEventBus);
+        registerMapMemory();
+    }
+
+    /** 1.0.1: the map remembers explored areas (client only, the singleplayer server's chunks are ignored). */
+    private static void registerMapMemory() {
+        IEventBus game = NeoForge.EVENT_BUS;
+        game.addListener(ClientPlayerNetworkEvent.LoggingIn.class, event -> MapMemory.onLogin());
+        game.addListener(ClientPlayerNetworkEvent.LoggingOut.class, event -> MapMemory.onLogout());
+        game.addListener(ChunkEvent.Load.class, event -> {
+            if (event.getLevel().isClientSide()) {
+                MapMemory.onChunkLoad(event.getChunk());
+            }
+        });
+        game.addListener(ChunkEvent.Unload.class, event -> {
+            if (event.getLevel().isClientSide()) {
+                MapMemory.onChunkUnload(event.getChunk());
+            }
+        });
     }
 
     private void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {

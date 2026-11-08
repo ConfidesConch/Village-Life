@@ -2,8 +2,6 @@ package io.github.confidesconch.villagelife.client.map;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.MapColor;
 
 /**
@@ -22,17 +20,17 @@ final class MapInk {
     private static final int CONTOUR = 5;
 
     static int color(ClientLevel level, BlockPos.MutableBlockPos pos, int x, int z, int step, int unknown) {
-        if (!level.hasChunkAt(x, z)) {
+        if (!MapSurface.known(level, x, z)) {
             return unknown;
         }
-        int height = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
-        MapColor color = surface(level, pos, x, height, z);
+        int height = MapSurface.height(level, x, z);
+        MapColor color = MapSurface.color(level, pos, x, height, z);
         if (color == MapColor.NONE) {
             return PAPER;
         }
         boolean water = color == MapColor.WATER;
-        int northHeight = level.hasChunkAt(x, z - step) ? level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z - step) : height;
-        int westHeight = level.hasChunkAt(x - step, z) ? level.getHeight(Heightmap.Types.WORLD_SURFACE, x - step, z) : height;
+        int northHeight = MapSurface.known(level, x, z - step) ? MapSurface.height(level, x, z - step) : height;
+        int westHeight = MapSurface.known(level, x - step, z) ? MapSurface.height(level, x - step, z) : height;
         if (water) {
             boolean shore = isLand(level, pos, x, z - step, northHeight) || isLand(level, pos, x - step, z, westHeight);
             return shore ? SHORE : WATER;
@@ -48,22 +46,11 @@ final class MapInk {
         return tone;
     }
 
-    private static MapColor surface(ClientLevel level, BlockPos.MutableBlockPos pos, int x, int height, int z) {
-        int y = height - 1;
-        BlockState state = level.getBlockState(pos.set(x, y, z));
-        MapColor color = state.getMapColor(level, pos);
-        if (color == MapColor.NONE && y > level.getMinY()) {
-            state = level.getBlockState(pos.set(x, y - 1, z));
-            color = state.getMapColor(level, pos);
-        }
-        return color;
-    }
-
     private static boolean isLand(ClientLevel level, BlockPos.MutableBlockPos pos, int x, int z, int height) {
-        if (!level.hasChunkAt(x, z)) {
+        if (!MapSurface.known(level, x, z)) {
             return false;
         }
-        MapColor color = surface(level, pos, x, height, z);
+        MapColor color = MapSurface.color(level, pos, x, height, z);
         return color != MapColor.WATER && color != MapColor.NONE;
     }
 

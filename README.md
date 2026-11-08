@@ -2,7 +2,7 @@
 
 > A Minecraft mod where you **build your village yourself** – and residents **live** in it.
 
-**Version:** 1.0.0 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
+**Version:** 1.0.1 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
 
 ---
 
@@ -47,8 +47,8 @@ find work, follow a daily routine, make friends, start families – and turn you
 - Guards, archers and a captain, an alarm bell, bandit raids that really plunder.
 
 **Village window** (key **B**)
-- Overview with problems and events, residents, jobs, buildings, economy, a parchment-style map, defence,
-  administration and your character – everything in one place.
+- Overview with problems and events, residents, jobs, buildings, economy, a parchment-style map that remembers
+  explored areas, defence, administration and your character – everything in one place.
 
 **Multiplayer** and dedicated servers are supported from the start. 100+ residents per village run without
 noticeable lag.
@@ -56,11 +56,15 @@ noticeable lag.
 ## Installation
 
 1. Install Minecraft Java Edition **26.3** with **NeoForge 26.3.0.100** or newer (26.3.x).
-2. Put `villagelife-26.3-1.0.0.jar` into the `mods` folder – on the server **and** on every player's game.
+2. Put `villagelife-26.3-1.0.1.jar` into the `mods` folder – on the server **and** on every player's game.
 3. Start the game. The village center and building markers are in the creative tab "Village Life" and can be
    crafted in survival:
-   - **Village center:** planks in the corners, cobblestone (or other stone) on the sides, a book in the middle.
+   - **Village center:** planks in the corners, cobblestone (or other stone) on the sides, paper in the middle.
    - **Building marker (2):** planks + stick + paper (shapeless).
+   - **Bell** (for the alarm and the captain): a stick on top, five gold ingots in the shape of a bell.
+
+   Every player also gets a village center and 5 building markers the first time they join a world (can be
+   turned off in the settings). A normal bell does **not** found a village – only the village center does.
 
 ## Quick start
 

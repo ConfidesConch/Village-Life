@@ -4,7 +4,7 @@
   "key": {
     "P": "#minecraft:planks",
     "C": "#minecraft:stone_crafting_materials",
-    "B": "minecraft:book"
+    "B": "minecraft:paper"
   },
   "pattern": [
     "PCP",

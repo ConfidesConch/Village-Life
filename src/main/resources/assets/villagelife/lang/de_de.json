@@ -851,5 +851,9 @@
   "villagelife.ui.player.too_small": "Für das Inventar ist das Fenster zu klein. Stell unten rechts den Regler „Fenster“ größer.",
   "villagelife.ui.player.open_village": "Klicken: dieses Dorf im Fenster öffnen",
   "villagelife.ui.player.remove_friend": "Freundschaft beenden",
-  "villagelife.ui.player.equipment": "Ausrüstung"
+  "villagelife.ui.player.equipment": "Ausrüstung",
+  "villagelife.configuration.starterKit": "Startpaket",
+  "villagelife.configuration.starterKit.tooltip": "Jeder Spieler bekommt beim ersten Betreten einer Welt einmalig ein Dorfzentrum und 5 Gebäudemarker.",
+  "villagelife.starter_kit.given": "Willkommen! Du hast ein Dorfzentrum und %s Gebäudemarker bekommen. Stelle das Dorfzentrum auf, um dein Dorf zu gründen.",
+  "villagelife.hint.plain_bell": "Eine normale Glocke gründet kein Dorf – stelle stattdessen ein Dorfzentrum her"
 }

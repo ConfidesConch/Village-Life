@@ -56,6 +56,12 @@ public final class SyncedConfig {
     public static final ModConfigSpec.IntValue TICK_BUDGET_MICROS = define(ConfigDefaults.TICK_BUDGET_MICROS,
             "Time budget per server tick for background work (building scans etc.), in microseconds.");
 
+    /** 1.0.1: village center + building markers once per world for every player. */
+    public static final ModConfigSpec.BooleanValue STARTER_KIT = BUILDER
+            .comment("Give every player a village center and 5 building markers when they first join a world.")
+            .translation(VillageLife.MOD_ID + ".configuration.starterKit")
+            .define("starterKit", true);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     private static ModConfigSpec.IntValue define(IntOption option, String comment) {

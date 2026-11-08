@@ -55,6 +55,7 @@ public final class VillageLife {
         ClaimSystem.init(modEventBus);
         MarketSystem.init(modEventBus); // M15a
         GrowthSystem.init(); // M16
+        io.github.confidesconch.villagelife.village.FirstSteps.init(); // 1.0.1
         SocialSystem.init(); // M17
         FamilySystem.init(); // M18b
         io.github.confidesconch.villagelife.defense.DefenseSystem.init(); // M20a

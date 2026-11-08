@@ -7,8 +7,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.MapColor;
 
 /**
@@ -150,23 +148,17 @@ public final class MapImage {
     }
 
     private int color(ClientLevel level, BlockPos.MutableBlockPos pos, int x, int z, int northZ) {
-        if (!level.hasChunkAt(x, z)) {
+        if (!MapSurface.known(level, x, z)) { // 1.0.1: remembered areas too
             return unknownColor;
         }
-        int height = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
-        int y = height - 1;
-        BlockState state = level.getBlockState(pos.set(x, y, z));
-        MapColor mapColor = state.getMapColor(level, pos);
-        if (mapColor == MapColor.NONE && y > level.getMinY()) {
-            state = level.getBlockState(pos.set(x, y - 1, z));
-            mapColor = state.getMapColor(level, pos);
-        }
+        int height = MapSurface.height(level, x, z);
+        MapColor mapColor = MapSurface.color(level, pos, x, height, z);
         if (mapColor == MapColor.NONE) {
             return unknownColor;
         }
         MapColor.Brightness brightness = MapColor.Brightness.NORMAL;
-        if (level.hasChunkAt(x, northZ)) {
-            int northHeight = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, northZ);
+        if (MapSurface.known(level, x, northZ)) {
+            int northHeight = MapSurface.height(level, x, northZ);
             if (height > northHeight) {
                 brightness = MapColor.Brightness.HIGH;
             } else if (height < northHeight) {

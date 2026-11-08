@@ -851,5 +851,9 @@
   "villagelife.ui.player.too_small": "The window is too small for the inventory. Make it bigger with the \"Window\" slider at the bottom right.",
   "villagelife.ui.player.open_village": "Click: open this village in the window",
   "villagelife.ui.player.remove_friend": "End the friendship",
-  "villagelife.ui.player.equipment": "Equipment"
+  "villagelife.ui.player.equipment": "Equipment",
+  "villagelife.configuration.starterKit": "Starter kit",
+  "villagelife.configuration.starterKit.tooltip": "Every player gets a village center and 5 building markers once per world on first join.",
+  "villagelife.starter_kit.given": "Welcome! You received a village center and %s building markers. Place the village center to found your village.",
+  "villagelife.hint.plain_bell": "A normal bell does not found a village – craft a village center instead"
 }
