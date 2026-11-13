@@ -94,6 +94,7 @@ public final class VillageLife {
         io.github.confidesconch.villagelife.social.SocialService.clear();
         io.github.confidesconch.villagelife.profession.JobService.clear();
         io.github.confidesconch.villagelife.profession.work.VillageGates.clear();
+        io.github.confidesconch.villagelife.profession.work.HealerGoal.clear(); // M24
         io.github.confidesconch.villagelife.book.VillageBookService.clear();
     }
 

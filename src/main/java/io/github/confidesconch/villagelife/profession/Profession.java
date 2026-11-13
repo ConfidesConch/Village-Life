@@ -21,12 +21,14 @@ import net.minecraft.resources.Identifier;
  * bucket for water), {@code work_area} (needs an assigned area, M13c), {@code order} (position in the
  * book), {@code essential} (a basic profession a new village needs first: highlighted in the book and at
  * the top of the default job priorities, M19a), {@code defender} (guards: fight monsters, are only knocked out,
- * count as guards for the village stage, M20a).
+ * count as guards for the village stage, M20a), {@code secondary} (its workstation is a block people also
+ * use as decoration, e.g. jukebox or cauldron: it only decides a building's profession if no workstation
+ * of a normal profession stands in it; bug review 13.11.2026).
  */
 public record Profession(List<Identifier> workstations, Identifier schedule, int workRadius,
                          Optional<Identifier> tool, List<Identifier> materials, List<Identifier> products,
                          List<Identifier> nearby, boolean workArea, int order, List<Craft> crafts, boolean essential,
-                         boolean defender) {
+                         boolean defender, boolean secondary) {
 
     /** Work problem of professions with {@code work_area} when none is assigned (book: {@code villagelife.problem.work.no_work_area}). */
     public static final String ISSUE_NO_WORK_AREA = "no_work_area";
@@ -43,7 +45,8 @@ public record Profession(List<Identifier> workstations, Identifier schedule, int
             Codec.INT.optionalFieldOf("order", 100).forGetter(Profession::order),
             Craft.CODEC.listOf().optionalFieldOf("crafts", List.of()).forGetter(Profession::crafts),
             Codec.BOOL.optionalFieldOf("essential", false).forGetter(Profession::essential),
-            Codec.BOOL.optionalFieldOf("defender", false).forGetter(Profession::defender)
+            Codec.BOOL.optionalFieldOf("defender", false).forGetter(Profession::defender),
+            Codec.BOOL.optionalFieldOf("secondary", false).forGetter(Profession::secondary)
     ).apply(instance, Profession::new));
 
     public Profession {

@@ -573,31 +573,121 @@
     "facing=north,symbol=captain,valid=false": {
       "model": "villagelife:block/marker_captain"
     },
+    "facing=north,symbol=bard,valid=false": {
+      "model": "villagelife:block/marker_bard"
+    },
+    "facing=north,symbol=healer,valid=false": {
+      "model": "villagelife:block/marker_healer"
+    },
+    "facing=north,symbol=druid,valid=false": {
+      "model": "villagelife:block/marker_druid"
+    },
     "facing=east,symbol=captain,valid=false": {
       "model": "villagelife:block/marker_captain",
+      "y": 90
+    },
+    "facing=east,symbol=bard,valid=false": {
+      "model": "villagelife:block/marker_bard",
+      "y": 90
+    },
+    "facing=east,symbol=healer,valid=false": {
+      "model": "villagelife:block/marker_healer",
+      "y": 90
+    },
+    "facing=east,symbol=druid,valid=false": {
+      "model": "villagelife:block/marker_druid",
       "y": 90
     },
     "facing=south,symbol=captain,valid=false": {
       "model": "villagelife:block/marker_captain",
       "y": 180
     },
+    "facing=south,symbol=bard,valid=false": {
+      "model": "villagelife:block/marker_bard",
+      "y": 180
+    },
+    "facing=south,symbol=healer,valid=false": {
+      "model": "villagelife:block/marker_healer",
+      "y": 180
+    },
+    "facing=south,symbol=druid,valid=false": {
+      "model": "villagelife:block/marker_druid",
+      "y": 180
+    },
     "facing=west,symbol=captain,valid=false": {
       "model": "villagelife:block/marker_captain",
+      "y": 270
+    },
+    "facing=west,symbol=bard,valid=false": {
+      "model": "villagelife:block/marker_bard",
+      "y": 270
+    },
+    "facing=west,symbol=healer,valid=false": {
+      "model": "villagelife:block/marker_healer",
+      "y": 270
+    },
+    "facing=west,symbol=druid,valid=false": {
+      "model": "villagelife:block/marker_druid",
       "y": 270
     },
     "facing=north,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid"
     },
+    "facing=north,symbol=bard,valid=true": {
+      "model": "villagelife:block/marker_bard_valid"
+    },
+    "facing=north,symbol=healer,valid=true": {
+      "model": "villagelife:block/marker_healer_valid"
+    },
+    "facing=north,symbol=druid,valid=true": {
+      "model": "villagelife:block/marker_druid_valid"
+    },
     "facing=east,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid",
+      "y": 90
+    },
+    "facing=east,symbol=bard,valid=true": {
+      "model": "villagelife:block/marker_bard_valid",
+      "y": 90
+    },
+    "facing=east,symbol=healer,valid=true": {
+      "model": "villagelife:block/marker_healer_valid",
+      "y": 90
+    },
+    "facing=east,symbol=druid,valid=true": {
+      "model": "villagelife:block/marker_druid_valid",
       "y": 90
     },
     "facing=south,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid",
       "y": 180
     },
+    "facing=south,symbol=bard,valid=true": {
+      "model": "villagelife:block/marker_bard_valid",
+      "y": 180
+    },
+    "facing=south,symbol=healer,valid=true": {
+      "model": "villagelife:block/marker_healer_valid",
+      "y": 180
+    },
+    "facing=south,symbol=druid,valid=true": {
+      "model": "villagelife:block/marker_druid_valid",
+      "y": 180
+    },
     "facing=west,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid",
+      "y": 270
+    },
+    "facing=west,symbol=bard,valid=true": {
+      "model": "villagelife:block/marker_bard_valid",
+      "y": 270
+    },
+    "facing=west,symbol=healer,valid=true": {
+      "model": "villagelife:block/marker_healer_valid",
+      "y": 270
+    },
+    "facing=west,symbol=druid,valid=true": {
+      "model": "villagelife:block/marker_druid_valid",
       "y": 270
     },
     "facing=north,symbol=field,valid=false": {

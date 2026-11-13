@@ -13,6 +13,12 @@ public enum MarkerSymbol implements StringRepresentable {
     HOUSE, STORAGE, WORKPLACE,
     LUMBERJACK, FARMER, FISHERMAN, SHEPHERD, BREEDER, MINER, COOK, SMITH, BAKER, CARPENTER, STOREKEEPER, MERCHANT,
     INNKEEPER, TEACHER, GUARD, ARCHER, CAPTAIN,
+    /** M23 */
+    BARD,
+    /** M24 */
+    HEALER,
+    /** M25 */
+    DRUID,
     /** M21d: fenced areas; never a profession's symbol. */
     FIELD, PASTURE;
 

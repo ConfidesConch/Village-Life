@@ -1,0 +1,9 @@
+{
+  "workstations": [
+    "minecraft:flowering_azalea"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 64,
+  "order": 137,
+  "secondary": true
+}

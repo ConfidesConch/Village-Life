@@ -2,7 +2,7 @@
 
 > A Minecraft mod where you **build your village yourself** – and residents **live** in it.
 
-**Version:** 1.0.1 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
+**Version:** 1.3.1 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
 
 ---
 
@@ -26,9 +26,9 @@ find work, follow a daily routine, make friends, start families – and turn you
 - They walk, open doors and gates, climb ladders, eat from storage and sleep in their own beds. Newcomers
   arrive when there is room and bring provisions.
 
-**17 professions** – each with a vanilla workstation
+**20 professions** – each with a vanilla workstation
 - Lumberjack, farmer, fisherman, shepherd, breeder, miner, cook, smith, baker, carpenter, storekeeper,
-  merchant, innkeeper, teacher, guard, archer, captain.
+  merchant, innkeeper, teacher, guard, archer, captain, bard, healer, druid.
 - Production chains: craftsmen work until a stock level is reached, the storekeeper moves materials and
   products, the smith smelts, forges and repairs tools.
 
@@ -40,6 +40,10 @@ find work, follow a daily routine, make friends, start families – and turn you
 **Community**
 - Friendships and quarrels, couples, children who grow up and go to school.
 - A tavern that turns into a bar in the evening: guests sit on chairs and benches around tables.
+- A bard plays music discs on the village square by day and in the tavern in the evening – everyone who
+  listens is in a better mood.
+- A healer looks after the injured and blesses the village every morning (everyone works a bit faster);
+  a druid helps crops and saplings grow.
 
 **Growth, laws and defence**
 - Settlement → village → town with more residents, a larger border and a supply parcel.
@@ -56,7 +60,7 @@ noticeable lag.
 ## Installation
 
 1. Install Minecraft Java Edition **26.3** with **NeoForge 26.3.0.100** or newer (26.3.x).
-2. Put `villagelife-26.3-1.0.1.jar` into the `mods` folder – on the server **and** on every player's game.
+2. Put `villagelife-26.3-1.3.1.jar` into the `mods` folder – on the server **and** on every player's game.
 3. Start the game. The village center and building markers are in the creative tab "Village Life" and can be
    crafted in survival:
    - **Village center:** planks in the corners, cobblestone (or other stone) on the sides, paper in the middle.

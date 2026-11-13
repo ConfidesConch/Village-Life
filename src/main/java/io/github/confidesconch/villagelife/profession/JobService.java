@@ -23,7 +23,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
@@ -203,20 +203,17 @@ public final class JobService {
      * lumberjack's hut with a barrel for storage stays a lumberjack's hut.
      */
     private static Optional<String> professionOf(ServerLevel level, Building building) {
-        Optional<String> fromContainer = Optional.empty();
+        List<Block> blocks = new ArrayList<>();
         for (BlockPos pos : building.workstations()) {
             if (level.isLoaded(pos)) {
-                BlockState state = level.getBlockState(pos);
-                Optional<String> profession = Professions.forWorkstation(state.getBlock()).map(Object::toString);
-                if (profession.isPresent() && !state.is(BuildingService.STORAGE_CONTAINERS)) {
-                    return profession;
-                }
-                if (fromContainer.isEmpty()) {
-                    fromContainer = profession;
-                }
+                blocks.add(level.getBlockState(pos).getBlock());
             }
         }
-        return fromContainer;
+        return Professions.forWorkstations(blocks, JobService::isContainer).map(Object::toString);
+    }
+
+    private static boolean isContainer(Block block) {
+        return block.defaultBlockState().is(BuildingService.STORAGE_CONTAINERS);
     }
 
     private static Optional<String> currentProfession(Village village, Building building) {

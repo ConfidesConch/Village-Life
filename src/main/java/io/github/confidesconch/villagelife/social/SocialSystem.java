@@ -19,5 +19,7 @@ public final class SocialSystem {
         ResidentHooks.addGoalProvider(resident -> resident.goalSelector.addGoal(4, new MeetFriendGoal(resident, 0.6)));
         // M17b: evenings in the tavern come before meeting friends elsewhere
         ResidentHooks.addGoalProvider(resident -> resident.goalSelector.addGoal(3, new TavernVisitGoal(resident, 0.6)));
+        // M23: the bard's work (priority 4 like all work goals)
+        ResidentHooks.addGoalProvider(resident -> resident.goalSelector.addGoal(4, new BardGoal(resident, 0.6)));
     }
 }

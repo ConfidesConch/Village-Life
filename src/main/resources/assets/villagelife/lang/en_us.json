@@ -855,5 +855,17 @@
   "villagelife.configuration.starterKit": "Starter kit",
   "villagelife.configuration.starterKit.tooltip": "Every player gets a village center and 5 building markers once per world on first join.",
   "villagelife.starter_kit.given": "Welcome! You received a village center and %s building markers. Place the village center to found your village.",
-  "villagelife.hint.plain_bell": "A normal bell does not found a village – craft a village center instead"
+  "villagelife.hint.plain_bell": "A normal bell does not found a village – craft a village center instead",
+  "villagelife.profession.bard": "Bard",
+  "villagelife.profession.bard.tip": "Fetches music discs from storage and plays on the square by day and in the tavern from 17:00. Everyone who hears him: +5 mood until morning. Without discs he plays tunes on a horn.",
+  "villagelife.workplace.bard": "Music Room",
+  "villagelife.problem.work.bard.no_disc": "Bard %s (workplace at %s) has no music disc",
+  "villagelife.problem.work.bard.no_disc.tip": "He still plays tunes on his horn. Put music discs into storage for real music – he takes up to 3 different ones and changes between them.",
+  "villagelife.problem.work.bard.no_disc.short": "no music disc",
+  "villagelife.profession.healer": "Healer",
+  "villagelife.profession.healer.tip": "Walks to hurt residents and heals them for free – knocked-out guards are back on duty at once. Every morning he blesses the village at its center: everyone works 10 % faster until 18:00.",
+  "villagelife.workplace.healer": "Infirmary",
+  "villagelife.profession.druid": "Druid",
+  "villagelife.profession.druid.tip": "Walks through the village and helps crops, melon and pumpkin stems and saplings grow – one step every few seconds, for free.",
+  "villagelife.workplace.druid": "Druid's Grove"
 }

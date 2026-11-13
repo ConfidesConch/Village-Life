@@ -1,0 +1,10 @@
+{
+  "workstations": [
+    "minecraft:cauldron",
+    "minecraft:water_cauldron"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 32,
+  "order": 136,
+  "secondary": true
+}

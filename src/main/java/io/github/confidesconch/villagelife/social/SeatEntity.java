@@ -40,7 +40,9 @@ public class SeatEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (level() instanceof ServerLevel level && (level.getGameTime() > keepUntil || !isVehicle())) {
+        // bug review 13.11.2026: also when the chair below was broken (nobody floats in the air)
+        if (level() instanceof ServerLevel level && (level.getGameTime() > keepUntil || !isVehicle()
+                || level.getBlockState(BlockPos.containing(getX(), getY() + RIDER_DROP, getZ())).isAir())) {
             ejectPassengers();
             discard();
         }

@@ -1,0 +1,6 @@
+{
+  "parent": "villagelife:block/marker_frame",
+  "textures": {
+    "picture": "villagelife:block/marker_healer"
+  }
+}

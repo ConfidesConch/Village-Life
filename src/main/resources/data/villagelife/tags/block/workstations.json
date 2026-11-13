@@ -17,8 +17,11 @@
     "minecraft:brewing_stand",
     "minecraft:grindstone",
     "minecraft:cauldron",
+    "minecraft:water_cauldron",
     "minecraft:bookshelf",
     "minecraft:target",
-    "minecraft:bell"
+    "minecraft:bell",
+    "minecraft:jukebox",
+    "minecraft:flowering_azalea"
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "workstations": [
+    "minecraft:jukebox"
+  ],
+  "schedule": "villagelife:bard",
+  "work_radius": 24,
+  "materials": [
+    "minecraft:music_disc_cat"
+  ],
+  "order": 135,
+  "secondary": true
+}

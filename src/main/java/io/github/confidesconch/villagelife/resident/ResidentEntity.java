@@ -42,6 +42,7 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.OpenDoorGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -223,7 +224,8 @@ public class ResidentEntity extends PathfinderMob {
     /** Work speed factor from needs: 0.5 when starving, 0.8–1.1 otherwise. */
     public double workSpeed() {
         return needs.workSpeed(level().getOverworldClockTime(), level().getGameTime(), brain.bedPos() != null)
-                * EducationRules.speedFactor(brain.education()); // M18c: school pays off
+                * EducationRules.speedFactor(brain.education()) // M18c: school pays off
+                * ResidentHooks.workBonus(this); // M24: the healer's blessing
     }
 
     /** Ground navigation that measures its path searches (M12c). */
@@ -288,7 +290,15 @@ public class ResidentEntity extends PathfinderMob {
     protected void customServerAiStep(ServerLevel level) {
         super.customServerAiStep(level);
         long start = System.nanoTime();
-        brain.tick(this, level);
+        if (brain.tick(this, level)) {
+            // bug review 13.11.2026: every second tick Minecraft ticks running goals without asking whether they
+            // may go on – a goal whose workplace or village just vanished would crash there. Stop those now.
+            for (WrappedGoal goal : goalSelector.getAvailableGoals()) {
+                if (goal.isRunning() && !goal.canContinueToUse()) {
+                    goal.stop();
+                }
+            }
+        }
         ModProfiler.addDetail(ModProfiler.BRAIN, System.nanoTime() - start, 1); // M21
         if (tickCount % 20 == 0) { // M21c: work clothes follow the job
             String profession = brain.job() == null ? "" : brain.job().profession();

@@ -32,7 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * {@code /villagelife debug testvillage} (M12a): builds a complete test village around the player on flat
  * ground – village center, houses, a dormitory with 100 beds, a storage and one workplace for every
- * profession incl. a market (with fields, pond, pastures, rock as needed), a wooden wall with a gate (M20b2) –
+ * profession incl. a market, tavern, school, music room, infirmary and grove (with fields, pond, pastures, rock as needed), a
+ * wooden wall with a gate (M20b2) –
  * and registers every building. Clears the area
  * first: meant for test worlds only.
  */
@@ -81,7 +82,8 @@ final class TestVillage {
         storage.door(2);
         storage.chest(5, 4, new ItemStack(Items.BREAD, 64), new ItemStack(Items.BREAD, 64), new ItemStack(Items.BREAD, 64),
                 new ItemStack(Items.BREAD, 64), new ItemStack(Items.OAK_SAPLING, 16), new ItemStack(Items.WHEAT_SEEDS, 32));
-        storage.chest(6, 4, new ItemStack(Items.BREAD, 64), new ItemStack(Items.BREAD, 64), worn(Items.IRON_AXE));
+        storage.chest(6, 4, new ItemStack(Items.BREAD, 64), new ItemStack(Items.BREAD, 64), worn(Items.IRON_AXE),
+                new ItemStack(Items.MUSIC_DISC_CAT), new ItemStack(Items.MUSIC_DISC_13)); // M23: for the bard
         others.add(storage.marker(3, 2, BuildingType.STORAGE));
 
         TestSite lumberjack = new TestSite(level, new BlockPos(center.getX() - 40, floorY, center.getZ() + 2));
@@ -217,6 +219,23 @@ final class TestVillage {
         school.door(3);
         school.set(3, 1, 5, Blocks.BOOKSHELF.defaultBlockState());
         others.add(school.marker(1, 3, BuildingType.WORKPLACE)); // M18c
+        TestSite musicRoom = new TestSite(level, new BlockPos(center.getX() + 15, floorY, center.getZ() + 2));
+        musicRoom.house(7, 5, 7, Blocks.CHERRY_PLANKS.defaultBlockState(), Blocks.CHERRY_PLANKS.defaultBlockState());
+        musicRoom.door(3);
+        musicRoom.set(5, 1, 5, Blocks.JUKEBOX.defaultBlockState());
+        musicRoom.chest(1, 5, new ItemStack(Items.MUSIC_DISC_BLOCKS));
+        others.add(musicRoom.marker(3, 3, BuildingType.WORKPLACE)); // M23: bard
+        TestSite infirmary = new TestSite(level, new BlockPos(center.getX() - 20, floorY, center.getZ() + 2));
+        infirmary.house(7, 5, 7, Blocks.DYED_TERRACOTTA.pick(DyeColor.WHITE).defaultBlockState(), Blocks.QUARTZ_BLOCK.defaultBlockState());
+        infirmary.door(3);
+        infirmary.set(5, 1, 5, Blocks.WATER_CAULDRON.defaultBlockState());
+        others.add(infirmary.marker(3, 3, BuildingType.WORKPLACE)); // M24: healer
+        TestSite grove = new TestSite(level, new BlockPos(center.getX() + 15, floorY, center.getZ() + 11));
+        grove.house(7, 5, 7, Blocks.MOSSY_COBBLESTONE.defaultBlockState(), Blocks.MOSS_BLOCK.defaultBlockState());
+        grove.door(3);
+        grove.set(5, 0, 5, Blocks.ROOTED_DIRT.defaultBlockState()); // azaleas need soil
+        grove.set(5, 1, 5, Blocks.FLOWERING_AZALEA.defaultBlockState());
+        others.add(grove.marker(3, 3, BuildingType.WORKPLACE)); // M25: druid
         // M20a/M20b2: defense – guardhouse with 2 beds (= 2 guards) and the captain's post at the north gate,
         // shooting range with 2 beds (= 2 archers)
         TestSite guardhouse = new TestSite(level, new BlockPos(center.getX() - 14, floorY, center.getZ() - 42));

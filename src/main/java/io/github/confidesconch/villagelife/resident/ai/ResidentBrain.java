@@ -112,11 +112,14 @@ public final class ResidentBrain {
         return Schedules.get(id);
     }
 
-    /** Called every server tick; does real work only when it is this resident's turn. */
-    public void tick(ResidentEntity resident, ServerLevel level) {
+    /**
+     * Called every server tick; does real work only when it is this resident's turn. Returns true if the
+     * resident re-planned (village, job, workplace and activity may have changed).
+     */
+    public boolean tick(ResidentEntity resident, ServerLevel level) {
         int interval = SyncedConfig.AI_THINK_INTERVAL_TICKS.getAsInt();
         if (!ThinkTimer.shouldThink(level.getGameTime(), resident.getId(), interval)) {
-            return;
+            return false;
         }
         long now = level.getGameTime();
         long elapsed = lastThinkGameTime < 0 ? 0 : now - lastThinkGameTime;
@@ -184,6 +187,7 @@ public final class ResidentBrain {
             }
         }
         resident.setChildSize(child);
+        return true;
     }
 
     /** True while a child should be in school (M18c): mornings of the work time. */

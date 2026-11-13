@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 
 import io.github.confidesconch.villagelife.resident.Job;
@@ -28,6 +29,7 @@ public final class ResidentHooks {
     private static volatile Consumer<ResidentEntity> knockoutHandler = resident -> { };
     private static volatile Predicate<UUID> alarm = village -> false;
     private static volatile ToIntFunction<UUID> eventMood = village -> 0;
+    private static volatile ToDoubleFunction<ResidentEntity> workBonus = resident -> 1.0;
     private static volatile Predicate<ResidentEntity> nightShift = resident -> false;
     private static volatile Predicate<ResidentEntity> escorting = resident -> false;
 
@@ -57,6 +59,15 @@ public final class ResidentHooks {
     /** M20b: extra mood of a village from events (e.g. a won defense). */
     public static void setEventMood(ToIntFunction<UUID> moodOfVillage) {
         eventMood = moodOfVillage;
+    }
+
+    /** M24: an extra work speed factor (the healer's morning blessing); 1.0 = none. */
+    public static void setWorkBonus(ToDoubleFunction<ResidentEntity> bonus) {
+        workBonus = bonus;
+    }
+
+    public static double workBonus(ResidentEntity resident) {
+        return workBonus.applyAsDouble(resident);
     }
 
     public static boolean isAlarm(UUID village) {

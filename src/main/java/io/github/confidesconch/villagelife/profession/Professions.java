@@ -55,6 +55,29 @@ public final class Professions extends SimpleJsonResourceReloadListener<Professi
                 .findFirst();
     }
 
+    /**
+     * The profession of a workplace with these workstation blocks (in scan order): the first workstation of
+     * a normal profession decides; then those of {@code secondary} professions (jukebox, cauldron, azalea –
+     * a tavern with a jukebox stays a tavern); last, workstations that are also storage containers (the
+     * fisherman's barrel, M13a – a lumberjack's hut with a barrel for storage stays a lumberjack's hut).
+     */
+    public static Optional<Identifier> forWorkstations(List<Block> blocks, java.util.function.Predicate<Block> isContainer) {
+        Optional<Identifier> best = Optional.empty();
+        int bestRank = Integer.MAX_VALUE;
+        for (Block block : blocks) {
+            Optional<Identifier> profession = forWorkstation(block);
+            if (profession.isEmpty()) {
+                continue;
+            }
+            int rank = isContainer.test(block) ? 2 : current.get(profession.get()).secondary() ? 1 : 0;
+            if (rank < bestRank) {
+                best = profession;
+                bestRank = rank;
+            }
+        }
+        return best;
+    }
+
     @Override
     protected void apply(Map<Identifier, Profession> loaded, ResourceManager manager, ProfilerFiller profiler) {
         current = Map.copyOf(loaded);

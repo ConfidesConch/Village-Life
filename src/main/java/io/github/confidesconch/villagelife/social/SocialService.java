@@ -47,17 +47,29 @@ public final class SocialService {
     private static final Map<UUID, Long> LAST_QUARREL = new HashMap<>();
     /** Until when a resident is "sociable" after an evening in the tavern (M17b); not saved. */
     private static final Map<UUID, Long> SOCIABLE_UNTIL = new HashMap<>();
+    /** Until when a resident enjoys the bard's music (M23); not saved. */
+    private static final Map<UUID, Long> MUSIC_UNTIL = new HashMap<>();
 
     /** Forgets everything kept in memory for the stopped server (bug review 08.11.2026). */
     public static void clear() {
         LAST_QUARREL.clear();
         SOCIABLE_UNTIL.clear();
+        MUSIC_UNTIL.clear();
         TavernPlaces.clear(); // M21e
     }
 
     /** Called by the tavern visit: the resident is sociable until the next morning. */
     static void markSociable(UUID resident, long untilGameTime) {
         SOCIABLE_UNTIL.put(resident, untilGameTime);
+    }
+
+    /** Called by the bard (M23): the resident heard music and is in a good mood until the next morning. */
+    static void markMusic(UUID resident, long untilGameTime) {
+        MUSIC_UNTIL.put(resident, untilGameTime);
+    }
+
+    static boolean heardMusic(UUID resident, long gameTime) {
+        return MUSIC_UNTIL.getOrDefault(resident, 0L) > gameTime;
     }
 
     static boolean isSociable(UUID resident, long gameTime) {
@@ -81,8 +93,14 @@ public final class SocialService {
                 manager.all().forEach(v -> v.residents().forEach(r -> residents.add(r.id())));
                 RelationshipStore.get(level).retain(residents);
                 clearLostPartners(manager);
-                LAST_QUARREL.keySet().retainAll(residents);
-                SOCIABLE_UNTIL.keySet().retainAll(residents);
+                // these lists are shared by all dimensions (bug review 13.11.2026): keep everybody's residents
+                Set<UUID> everywhere = new HashSet<>();
+                for (ServerLevel other : event.getServer().getAllLevels()) {
+                    VillageManager.get(other).all().forEach(v -> v.residents().forEach(r -> everywhere.add(r.id())));
+                }
+                LAST_QUARREL.keySet().retainAll(everywhere);
+                SOCIABLE_UNTIL.keySet().retainAll(everywhere);
+                MUSIC_UNTIL.keySet().retainAll(everywhere);
             }
         }
     }
@@ -114,7 +132,8 @@ public final class SocialService {
             }
             Long quarrel = LAST_QUARREL.get(resident.getUUID());
             boolean recent = quarrel != null && now - quarrel < RelationshipRules.QUARREL_MEMORY_TICKS;
-            resident.setSocialMood(RelationshipRules.socialMood(friends, recent, isSociable(resident.getUUID(), now)));
+            resident.setSocialMood(RelationshipRules.socialMood(friends, recent, isSociable(resident.getUUID(), now),
+                    heardMusic(resident.getUUID(), now)));
         }
     }
 

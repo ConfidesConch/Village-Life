@@ -12,8 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -80,6 +83,13 @@ public final class MapMemory {
             capture(chunk);
         }
         saveAll();
+        try { // bug review 13.11.2026: wait for the files, the game may be closed right after leaving
+            SAVER.submit(() -> { }).get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException | TimeoutException e) {
+            VillageLife.LOGGER.warn("Map memory was not saved in time", e);
+        }
         DIMENSIONS.clear();
         LOADED_FILES.clear();
         LIVE.clear();

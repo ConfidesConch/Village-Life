@@ -63,6 +63,7 @@ otherwise the building scan does not count it as a workstation.
 | `order` | number | 100 | Position in lists (lower = earlier) |
 | `essential` | true/false | false | Basic profession a new village needs first: highlighted, top of the default job priorities |
 | `defender` | true/false | false | Counts as a guard for village stages and raids |
+| `secondary` | true/false | false | The workstation is a block people also use as decoration (built-in: jukebox, cauldron, flowering azalea). It only decides a building's profession if no workstation of a normal profession stands in the same building |
 | `crafts` | list of crafts | `[]` | Recipes – see below |
 
 `tool`, `materials`, `products` and `nearby` only **describe** the profession in the village window. What a
@@ -83,11 +84,11 @@ village holds fewer than `stock` of the output.
 
 A stack is `{"item": "<id or #tag>", "count": 1–64}`; `count` defaults to 1.
 
-**Example – a potter** working at a cauldron (already in the workstation tag and not used by a built-in profession):
+**Example – a potter** working at a decorated pot (add it to the workstation tag as shown in [Tags](#tags)):
 
 ```json
 {
-  "workstations": ["minecraft:cauldron"],
+  "workstations": ["minecraft:decorated_pot"],
   "work_radius": 16,
   "materials": ["minecraft:brick"],
   "products": ["minecraft:flower_pot"],
@@ -107,8 +108,8 @@ A stack is `{"item": "<id or #tag>", "count": 1–64}`; `count` defaults to 1.
 > (lumberjack), fletching table (carpenter), furnace (baker), smoker (cook), smithing table (smith), composter
 > (farmer), hay block (breeder), loom (shepherd), barrel (fisherman), stonecutter (miner), lectern
 > (storekeeper), bookshelf (teacher), brewing stand (innkeeper), cartography table (merchant), grindstone
-> (guard), target (archer), bell (captain). The smith also uses a blast furnace near its workplace. Free in the
-> tag: anvils, cauldron.
+> (guard), target (archer), bell (captain), jukebox (bard), cauldron (healer), flowering azalea (druid). The smith also uses a blast furnace
+> near its workplace. Free in the tag: anvils.
 
 ---
 

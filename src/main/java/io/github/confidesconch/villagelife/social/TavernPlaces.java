@@ -79,6 +79,22 @@ final class TavernPlaces {
         return chosen;
     }
 
+    /** A free standing place only (the bard, M23: seats are for the guests); null if there is none. */
+    static Place claimStanding(ServerLevel level, Building tavern, UUID guest, RandomSource random) {
+        long now = level.getGameTime();
+        List<Place> standing = new ArrayList<>();
+        for (Place place : layout(level, tavern, now).places()) {
+            if (!place.seat() && isFree(place.pos(), guest, now)) {
+                standing.add(place);
+            }
+        }
+        Place chosen = roomyStandingPlace(standing, guest, now, random);
+        if (chosen != null) {
+            TAKEN.put(chosen.pos(), new Taken(guest, now + HOLD_TICKS));
+        }
+        return chosen;
+    }
+
     /** The guest is still there: keeps its place. */
     static void hold(Place place, UUID guest, long now) {
         TAKEN.put(place.pos(), new Taken(guest, now + HOLD_TICKS));

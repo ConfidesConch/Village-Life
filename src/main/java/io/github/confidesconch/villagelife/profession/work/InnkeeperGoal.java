@@ -54,7 +54,8 @@ public class InnkeeperGoal extends WorkGoal {
 
     @Override
     public void stop() {
-        if (resident.level() instanceof ServerLevel level && resident.carriedCount(food) > 0) {
+        // bug review 13.11.2026: the tavern may just have been removed (no workplace any more)
+        if (resident.level() instanceof ServerLevel level && workplace() != null && resident.carriedCount(food) > 0) {
             BlockPos chest = tavernChest(level);
             Container container = chest == null ? null : StorageAccess.containerAt(level, chest);
             if (container != null) { // never walk off with the guests' food

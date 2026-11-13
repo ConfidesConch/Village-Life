@@ -278,7 +278,8 @@ public class TavernVisitGoal extends Goal {
         return Optional.empty();
     }
 
-    private static Optional<BlockPos> brewingStand(ServerLevel level, Village village) {
+    /** The brewing stand (the counter) of the village's tavern. */
+    static Optional<BlockPos> brewingStand(ServerLevel level, Village village) {
         return tavern(level, village).flatMap(building -> building.workstations().stream()
                 .filter(pos -> level.isLoaded(pos) && level.getBlockState(pos).is(Blocks.BREWING_STAND))
                 .findFirst());

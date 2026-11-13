@@ -855,5 +855,17 @@
   "villagelife.configuration.starterKit": "Startpaket",
   "villagelife.configuration.starterKit.tooltip": "Jeder Spieler bekommt beim ersten Betreten einer Welt einmalig ein Dorfzentrum und 5 Gebäudemarker.",
   "villagelife.starter_kit.given": "Willkommen! Du hast ein Dorfzentrum und %s Gebäudemarker bekommen. Stelle das Dorfzentrum auf, um dein Dorf zu gründen.",
-  "villagelife.hint.plain_bell": "Eine normale Glocke gründet kein Dorf – stelle stattdessen ein Dorfzentrum her"
+  "villagelife.hint.plain_bell": "Eine normale Glocke gründet kein Dorf – stelle stattdessen ein Dorfzentrum her",
+  "villagelife.profession.bard": "Barde",
+  "villagelife.profession.bard.tip": "Holt Schallplatten aus dem Lager und spielt tagsüber am Dorfplatz, ab 17 Uhr in der Taverne. Wer ihn hört: +5 Stimmung bis zum Morgen. Ohne Schallplatten spielt er Melodien auf einem Horn.",
+  "villagelife.workplace.bard": "Musikzimmer",
+  "villagelife.problem.work.bard.no_disc": "Barde %s (Arbeitsplatz bei %s) hat keine Schallplatte",
+  "villagelife.problem.work.bard.no_disc.tip": "Er spielt trotzdem Melodien auf seinem Horn. Leg Schallplatten ins Lager für echte Musik – er nimmt bis zu 3 verschiedene mit und wechselt zwischen ihnen.",
+  "villagelife.problem.work.bard.no_disc.short": "keine Schallplatte",
+  "villagelife.profession.healer": "Heiler",
+  "villagelife.profession.healer.tip": "Geht zu verletzten Bewohnern und heilt sie kostenlos – bewusstlose Wachen sind sofort wieder im Dienst. Jeden Morgen segnet er das Dorf am Dorfzentrum: alle arbeiten bis 18 Uhr 10 % schneller.",
+  "villagelife.workplace.healer": "Krankenstube",
+  "villagelife.profession.druid": "Druide",
+  "villagelife.profession.druid.tip": "Geht durchs Dorf und lässt Feldfrüchte, Melonen- und Kürbisranken und Setzlinge wachsen – alle paar Sekunden eine Stufe, kostenlos.",
+  "villagelife.workplace.druid": "Druidenhain"
 }

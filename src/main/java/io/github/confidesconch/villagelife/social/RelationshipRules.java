@@ -61,8 +61,14 @@ public final class RelationshipRules {
      * lowers it, an evening in the tavern lifts it until the next morning (M17b).
      */
     public static int socialMood(int friendsNearby, boolean recentQuarrel, boolean sociable) {
+        return socialMood(friendsNearby, recentQuarrel, sociable, false);
+    }
+
+    /** As above, plus the bard's music heard today (M23): +5 until the next morning. */
+    public static int socialMood(int friendsNearby, boolean recentQuarrel, boolean sociable, boolean heardMusic) {
         int bonus = Math.min(MAX_FRIEND_BONUS, friendsNearby * FRIEND_BONUS);
-        return bonus + (recentQuarrel ? QUARREL_MALUS : 0) + (sociable ? TAVERN_BONUS : 0);
+        return bonus + (recentQuarrel ? QUARREL_MALUS : 0) + (sociable ? TAVERN_BONUS : 0)
+                + (heardMusic ? BardRules.MUSIC_BONUS : 0);
     }
 
     /** Share of happy talks between single adult best friends that make them a couple (M18). */
