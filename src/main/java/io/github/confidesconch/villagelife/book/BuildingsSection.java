@@ -16,11 +16,10 @@ import io.github.confidesconch.villagelife.inventory.StorageAccess;
 import io.github.confidesconch.villagelife.profession.JobService;
 import io.github.confidesconch.villagelife.profession.Profession;
 import io.github.confidesconch.villagelife.profession.Professions;
-import io.github.confidesconch.villagelife.profession.work.HerdGoal;
+import io.github.confidesconch.villagelife.profession.work.WorkAreas;
 import io.github.confidesconch.villagelife.resident.ResidentRecord;
 import io.github.confidesconch.villagelife.village.Village;
 import io.github.confidesconch.villagelife.village.VillageManager;
-import io.github.confidesconch.villagelife.village.VillageZone;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -48,14 +47,6 @@ final class BuildingsSection {
 
     static void write(ServerPlayer player, Village village, CompoundTag out) {
         out.putBoolean("can_manage", village.mayManage(player.getUUID()));
-        ListTag zones = new ListTag();
-        for (VillageZone zone : village.zones()) {
-            CompoundTag z = new CompoundTag();
-            z.putInt("id", zone.id());
-            z.putString("name", zone.name());
-            zones.add(z);
-        }
-        out.put("zones", zones); // choices for the work area (M13c)
         Map<UUID, String> professions = new HashMap<>();
         JobService.workplaces(player.level(), village).forEach(w -> professions.put(w.buildingId(), w.profession()));
         ListTag list = new ListTag();
@@ -99,14 +90,10 @@ final class BuildingsSection {
                 b.putString("profession", profession);
                 b.putBoolean("needs_area", Professions.get(profession).map(Profession::workArea).orElse(false));
             }
-            village.workAreaOf(building.id()).ifPresent(zone -> {
-                b.putInt("work_area", zone.id());
-                b.putString("work_area_name", zone.name());
+            WorkAreas.of(village, building, profession).ifPresent(area -> { // M28b: only marked areas (signs)
+                b.putString("auto_area", area.markerPos().toShortString());
+                b.putString("auto_area_type", area.type().getSerializedName());
             });
-            if (village.workAreaOf(building.id()).isEmpty()) { // M21d: herders use the nearest marked pasture
-                HerdGoal.autoPasture(village, building, profession)
-                        .ifPresent(pasture -> b.putString("auto_area", pasture.markerPos().toShortString()));
-            }
             list.add(b);
         }
         out.put("list", list);
@@ -186,28 +173,10 @@ final class BuildingsSection {
             return;
         }
         String action = payload.action();
-        if (action.startsWith("area:") && village.get().mayManage(player.getUUID())) {
-            setWorkArea(manager, village.get(), buildingId, action.substring(5));
-        } else if (!action.equals("view") && village.get().mayManage(player.getUUID())) {
+        if (!action.equals("view") && !action.startsWith("area:") && village.get().mayManage(player.getUUID())) {
             change(level, player, building.get().markerPos(), action);
         }
         VillageBookService.openBuilding(player, manager.byId(villageId).orElse(village.get()), buildingId);
-    }
-
-    /** {@code area:<zone id>} assigns one of the village's zones as work area, {@code area:none} removes it (M13c). */
-    private static void setWorkArea(VillageManager manager, Village village, UUID buildingId, String zone) {
-        if (zone.equals("none")) {
-            manager.update(village.withWorkArea(buildingId, Optional.empty()));
-            return;
-        }
-        try {
-            int zoneId = Integer.parseInt(zone);
-            if (village.zones().stream().anyMatch(z -> z.id() == zoneId)) {
-                manager.update(village.withWorkArea(buildingId, Optional.of(zoneId)));
-            }
-        } catch (NumberFormatException invalid) {
-            // ignore: the value came from a client
-        }
     }
 
     private static void change(ServerLevel level, ServerPlayer player, BlockPos marker, String action) {

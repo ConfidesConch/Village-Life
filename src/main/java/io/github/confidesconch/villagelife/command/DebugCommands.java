@@ -17,6 +17,7 @@ import io.github.confidesconch.villagelife.defense.RaidService;
 import io.github.confidesconch.villagelife.family.FamilyService;
 import io.github.confidesconch.villagelife.growth.GrowthService;
 import io.github.confidesconch.villagelife.market.CaravanService;
+import io.github.confidesconch.villagelife.market.StallService;
 import io.github.confidesconch.villagelife.market.contract.ContractService;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.social.SocialService;
@@ -102,6 +103,21 @@ final class DebugCommands {
                         return 0;
                     }
                     source.sendSuccess(() -> Component.translatable("villagelife.debug.caravan.done"), false);
+                    return 1;
+                }))
+                .then(Commands.literal("stall").executes(context -> { // M28c: the daily market trader comes now
+                    CommandSourceStack source = context.getSource();
+                    Optional<Village> village = VillageManager.get(source.getLevel())
+                            .findAt(BlockPos.containing(source.getPosition()));
+                    if (village.isEmpty()) {
+                        source.sendFailure(Component.translatable("villagelife.village.none_here"));
+                        return 0;
+                    }
+                    if (!StallService.callNow(source.getLevel(), village.get())) {
+                        source.sendFailure(Component.translatable("villagelife.debug.stall.none"));
+                        return 0;
+                    }
+                    source.sendSuccess(() -> Component.translatable("villagelife.debug.stall.done"), false);
                     return 1;
                 }))
                 .then(Commands.literal("contracts").executes(context -> {

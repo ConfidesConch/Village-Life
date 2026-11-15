@@ -1,6 +1,7 @@
 package io.github.confidesconch.villagelife.profession.work;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 
@@ -18,6 +19,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
  * Brings one escaped animal back into the work area (M13d, chosen by the owner: "lure, with carrying as
@@ -112,6 +116,11 @@ final class HerdLure {
 
     /** Puff of dust, and the animal stands at {@code pos} (lifted over the gate, or carried in as fallback). */
     private void moveInto(ServerLevel level, BlockPos pos) {
+        carry(level, animal, pos);
+    }
+
+    /** Puff of dust, and the animal stands at {@code pos} (also M28b: carried to its own pasture). */
+    static void carry(ServerLevel level, Animal animal, BlockPos pos) {
         level.sendParticles(ParticleTypes.POOF, animal.getX(), animal.getY() + 0.5, animal.getZ(), 8, 0.3, 0.3, 0.3, 0.02);
         animal.getNavigation().stop();
         animal.teleportTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
@@ -119,8 +128,41 @@ final class HerdLure {
         level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.NEUTRAL, 0.4F, 0.8F);
     }
 
+    /**
+     * M28b: where a released animal is put – two blocks outside the pasture's gate, or (no gate) two blocks
+     * outside its north-west corner, on the ground.
+     */
+    static BlockPos outside(ServerLevel level, HerdArea area) {
+        BlockPos gate = findGate(level, area);
+        BlockPos spot = gate != null
+                ? gate.relative(outwardSide(gate, area), 2)
+                : new BlockPos(area.zone().minX() - 2, area.markerY(), area.zone().minZ() - 2);
+        return level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, spot);
+    }
+
     /** A fence gate on the border of the area or one block outside it, or null (open pasture). */
     private static BlockPos findGate(ServerLevel level, HerdArea area) {
+        return gateWhere(level, area, state -> true);
+    }
+
+    /** A gate of the area somebody left open (not one held open by redstone), or null. */
+    static BlockPos openGate(ServerLevel level, HerdArea area) {
+        return gateWhere(level, area, state -> state.getValue(FenceGateBlock.OPEN) && !state.getValue(FenceGateBlock.POWERED));
+    }
+
+    /** Closes the gate at {@code pos} like a player would (sound included); false if it is no open gate any more. */
+    static boolean closeGate(ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (!(state.getBlock() instanceof FenceGateBlock) || !state.getValue(FenceGateBlock.OPEN)) {
+            return false;
+        }
+        level.setBlockAndUpdate(pos, state.setValue(FenceGateBlock.OPEN, false));
+        level.playSound(null, pos, SoundEvents.FENCE_GATE_CLOSE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.gameEvent(GameEvent.BLOCK_CLOSE, pos, GameEvent.Context.of(state));
+        return true;
+    }
+
+    private static BlockPos gateWhere(ServerLevel level, HerdArea area, Predicate<BlockState> wanted) {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int ring = 0; ring <= 1; ring++) {
             int minX = area.zone().minX() - ring;
@@ -133,7 +175,8 @@ final class HerdLure {
                         continue; // only the border
                     }
                     for (int y = area.markerY() - 4; y <= area.markerY() + 4; y++) {
-                        if (level.isLoaded(pos.set(x, y, z)) && level.getBlockState(pos).getBlock() instanceof FenceGateBlock) {
+                        if (level.isLoaded(pos.set(x, y, z)) && level.getBlockState(pos).getBlock() instanceof FenceGateBlock
+                                && wanted.test(level.getBlockState(pos))) {
                             return pos.immutable();
                         }
                     }

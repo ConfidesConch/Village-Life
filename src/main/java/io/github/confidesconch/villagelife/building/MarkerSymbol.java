@@ -19,8 +19,18 @@ public enum MarkerSymbol implements StringRepresentable {
     HEALER,
     /** M25 */
     DRUID,
+    /** M26 */
+    ENCHANTER,
+    /** M27 */
+    BUTCHER,
     /** M21d: fenced areas; never a profession's symbol. */
-    FIELD, PASTURE;
+    FIELD, PASTURE,
+    /** M28b: a pasture for one kind of animal ({@link PastureKind}). */
+    PASTURE_COW, PASTURE_PIG, PASTURE_CHICKEN, PASTURE_SHEEP,
+    /** M28b: the miner's fenced quarry. */
+    QUARRY,
+    /** M28d: the miner's tunnel. */
+    TUNNEL;
 
     @Override
     public String getSerializedName() {

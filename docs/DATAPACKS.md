@@ -59,11 +59,11 @@ otherwise the building scan does not count it as a workstation.
 | `materials` | list of item ids | `[]` | What the worker fetches from storage (shown in the window) |
 | `products` | list of item ids | `[]` | What the worker delivers (shown in the window) |
 | `nearby` | list of item ids | `[]` | What must be near the workplace (shown in the window) |
-| `work_area` | true/false | false | Needs a work area drawn on the map (only used by built-in herders and miners) |
+| `work_area` | true/false | false | Needs a work area marked with a sign: a fenced pasture for herders, a fenced quarry or a tunnel sign on rock for miners (only used by the built-in herders and miners) |
 | `order` | number | 100 | Position in lists (lower = earlier) |
 | `essential` | true/false | false | Basic profession a new village needs first: highlighted, top of the default job priorities |
 | `defender` | true/false | false | Counts as a guard for village stages and raids |
-| `secondary` | true/false | false | The workstation is a block people also use as decoration (built-in: jukebox, cauldron, flowering azalea). It only decides a building's profession if no workstation of a normal profession stands in the same building |
+| `secondary` | true/false | false | The workstation is a block people also use as decoration (built-in: jukebox, cauldron, flowering azalea, bookshelf, campfire). It only decides a building's profession if no workstation of a normal profession stands in the same building |
 | `crafts` | list of crafts | `[]` | Recipes – see below |
 
 `tool`, `materials`, `products` and `nearby` only **describe** the profession in the village window. What a
@@ -108,7 +108,7 @@ A stack is `{"item": "<id or #tag>", "count": 1–64}`; `count` defaults to 1.
 > (lumberjack), fletching table (carpenter), furnace (baker), smoker (cook), smithing table (smith), composter
 > (farmer), hay block (breeder), loom (shepherd), barrel (fisherman), stonecutter (miner), lectern
 > (storekeeper), bookshelf (teacher), brewing stand (innkeeper), cartography table (merchant), grindstone
-> (guard), target (archer), bell (captain), jukebox (bard), cauldron (healer), flowering azalea (druid). The smith also uses a blast furnace
+> (guard), target (archer), bell (captain), jukebox (bard), cauldron (healer), flowering azalea (druid), enchanting table (enchanter), campfire and soul campfire (butcher). The smith also uses a blast furnace
 > near its workplace. Free in the tag: anvils.
 
 ---
@@ -140,6 +140,31 @@ twice the target: ×0.7). Prices are rounded and never below 1 emerald.
 
 ---
 
+## Market trader offers
+
+`data/<namespace>/stall_offer/<name>.json` – something the daily market trader may sell. Every morning a
+market trader comes to the village center, brings 5 of these offers (picked by weight, the same all day)
+and leaves at dusk. Players pay with emeralds; each offer can be bought 4 times a day.
+
+| Field | Default | Meaning |
+|---|---|---|
+| `item` | – | Item id |
+| `count` | 1 | Items per trade (1–64) |
+| `emeralds` | 1 | Price in emeralds (1–64) |
+| `weight` | 10 | How often it comes up compared to the others (1–1000) |
+
+```json
+{
+  "item": "minecraft:cherry_sapling",
+  "count": 2,
+  "emeralds": 3,
+  "weight": 10
+}
+```
+
+To remove a built-in offer, override its file (e.g. `data/villagelife/stall_offer/saddle.json`) with a very
+low weight, or replace all of them. Without any offer the market trader does not come.
+
 ## Daily schedules
 
 `data/<namespace>/schedule/<name>.json` – a daily plan, referenced by professions via `schedule`.
@@ -170,19 +195,19 @@ residents with their own plan keep it.
 ## Building requirements
 
 `data/villagelife/building_type/<type>.json` – the minimum a building marker's room must have. Only the
-five built-in types exist: `house`, `storage`, `workplace`, `field`, `pasture`. You can change their
+seven built-in types exist: `house`, `storage`, `workplace`, `field`, `pasture`, `quarry`, `tunnel` (a sign on a rock face; its requirement is not used). You can change their
 requirements, but not add new types.
 
 | Field | Default | Meaning |
 |---|---|---|
-| `min_volume` | 1 | Interior size in blocks; for `field` and `pasture` the area in blocks |
+| `min_volume` | 1 | Interior size in blocks; for `field`, `pasture` and `quarry` the area in blocks |
 | `min_doors` | 0 | Doors |
 | `min_beds` | 0 | Beds |
 | `min_containers` | 0 | Storage containers (tag `villagelife:storage_containers`) |
 | `min_workstations` | 0 | Workstations (tag `villagelife:workstations`) |
 
 Built-in values: house 12 volume, 1 door, 1 bed · storage 8 volume, 1 door, 1 container · workplace 8 volume,
-1 door, 1 workstation · field 9 · pasture 16. Example – houses need at least 20 blocks of room:
+1 door, 1 workstation · field 9 · pasture 16 · quarry 9. Example – houses need at least 20 blocks of room:
 
 ```json
 {

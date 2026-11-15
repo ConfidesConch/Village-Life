@@ -1,0 +1,14 @@
+{
+  "workstations": [
+    "minecraft:enchanting_table"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 24,
+  "materials": [
+    "minecraft:iron_pickaxe"
+  ],
+  "products": [
+    "minecraft:iron_pickaxe"
+  ],
+  "order": 138
+}

@@ -38,6 +38,7 @@ public final class VillageLifeClient {
                 (net.minecraft.server.packs.resources.ResourceManagerReloadListener) manager -> ResidentSkins.clear()));
         VillageBookClient.init(modEventBus);
         registerMapMemory();
+        ResidentHighlight.init();
     }
 
     /** 1.0.1: the map remembers explored areas (client only, the singleplayer server's chunks are ignored). */

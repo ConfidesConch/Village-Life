@@ -22,6 +22,8 @@ public final class MapOverlay {
     /** M21d: fields and pastures marked with a marker. */
     public static final int FIELD = 0xFFC9B23A;
     public static final int PASTURE = 0xFF8FD16A;
+    /** M28b: the miner's marked quarry. */
+    public static final int QUARRY = 0xFF9A9A9A;
     public static final int INVALID = 0xFFD03A2F;
     public static final int RESIDENT = 0xFFFFD84A;
     public static final int PLAYER = 0xFFFFFFFF;
@@ -56,6 +58,7 @@ public final class MapOverlay {
                 case "villagelife.building_type.storage" -> STORAGE;
                 case "villagelife.building_type.field" -> FIELD;
                 case "villagelife.building_type.pasture" -> PASTURE;
+                case "villagelife.building_type.quarry", "villagelife.building_type.tunnel" -> QUARRY;
                 default -> WORKPLACE;
             };
             int x0 = x + (int) (map.pixelX(b.getIntOr("min_x", 0) - 1) * factor);

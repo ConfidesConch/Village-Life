@@ -30,6 +30,8 @@ public final class Treasury {
     public static final String PAYMENT_OUT = "payment_out";
     public static final String PAYMENT_IN = "payment_in";
     public static final String RETURNED = "returned";
+    /** M26: a player paid the enchanter. */
+    public static final String ENCHANTING = "enchanting";
     private static final long DAY_TICKS = 24000;
 
     /**

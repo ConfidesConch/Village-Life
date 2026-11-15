@@ -10,7 +10,7 @@ import io.github.confidesconch.villagelife.profession.JobAllocator.Workplace;
 import io.github.confidesconch.villagelife.profession.JobService;
 import io.github.confidesconch.villagelife.profession.Profession;
 import io.github.confidesconch.villagelife.profession.Professions;
-import io.github.confidesconch.villagelife.profession.work.HerdGoal;
+import io.github.confidesconch.villagelife.profession.work.WorkAreas;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.resident.ResidentRecord;
 import io.github.confidesconch.villagelife.resident.ResidentService;
@@ -94,8 +94,8 @@ final class ProfessionsSection {
             }
         }
         boolean pasture = village.buildings().stream().filter(b -> b.id().equals(buildingId)).findFirst()
-                .flatMap(b -> HerdGoal.autoPasture(village, b, profession)).isPresent(); // M21d
-        if (data.workArea() && village.workAreaOf(buildingId).isEmpty() && !pasture && !w.contains("issue")) {
+                .flatMap(b -> WorkAreas.of(village, b, profession)).isPresent(); // M28b: only marked areas
+        if (data.workArea() && !pasture && !w.contains("issue")) {
             w.putString("issue", Profession.ISSUE_NO_WORK_AREA); // also shown while nobody works there (M13c)
         }
         return w;

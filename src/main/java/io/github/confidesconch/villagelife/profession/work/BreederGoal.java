@@ -15,14 +15,16 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 /**
- * Work of the breeder (M13d): cows, pigs and chickens in its work area. Picks up the eggs the chickens
+ * Work of the breeder (M13d): cows, pigs and chickens in its work area – M28b (owner's choice "B"):
+ * also the sheep (feeding, breeding, bringing back; the shepherd only shears them). Picks up the eggs the chickens
  * lay, milks each cow once a day if it has empty buckets (fetched from storage), breeds every kind with
- * its own feed up to the village's herd limit and slaughters adults above it (beef, leather, pork,
- * chicken, feathers). The herd limit counts each kind separately.
+ * its own feed up to the village's herd limit (slaughtering: the butcher, M27). The herd limit counts
+ * each kind separately.
  */
 public class BreederGoal extends HerdGoal<Animal> {
     public static final String PROFESSION = "villagelife:breeder";
@@ -37,14 +39,20 @@ public class BreederGoal extends HerdGoal<Animal> {
         super(resident, speedModifier, PROFESSION, ItemTags.SWORDS, Items.WOODEN_SWORD, Animal.class);
     }
 
-    @Override
-    protected boolean accepts(Animal animal) {
+    /** Cows, pigs and chickens (also what the butcher slaughters in a breeder's area, M27). */
+    static boolean isLivestock(Animal animal) {
         return animal instanceof Cow || animal instanceof Pig || animal instanceof Chicken;
     }
 
     @Override
+    protected boolean accepts(Animal animal) {
+        return isLivestock(animal) || animal instanceof Sheep; // M28b: the sheep, too
+    }
+
+    @Override
     protected boolean isFeed(ItemStack stack) {
-        return stack.is(ItemTags.COW_FOOD) || stack.is(ItemTags.PIG_FOOD) || stack.is(ItemTags.CHICKEN_FOOD);
+        return stack.is(ItemTags.COW_FOOD) || stack.is(ItemTags.PIG_FOOD) || stack.is(ItemTags.CHICKEN_FOOD)
+                || stack.is(ItemTags.SHEEP_FOOD);
     }
 
     @Override

@@ -74,6 +74,9 @@ public class ResidentRenderer extends HumanoidMobRenderer<ResidentEntity, Reside
         state.skinSeed = resident.getSkin();
         state.female = resident.isFemale();
         state.profession = resident.getProfessionId();
+        if (ResidentHighlight.isHighlighted(resident)) { // right-clicked: glows for two minutes (15.11.2026)
+            state.outlineColor = ResidentHighlight.COLOR;
+        }
     }
 
     @Override

@@ -40,7 +40,8 @@ public final class BuildingsPage implements UiPage {
         HOUSES(b -> "house".equals(b.getStringOr("type_id", ""))),
         STORAGE(b -> "storage".equals(b.getStringOr("type_id", ""))),
         WORKPLACES(b -> "workplace".equals(b.getStringOr("type_id", ""))),
-        AREAS(b -> "field".equals(b.getStringOr("type_id", "")) || "pasture".equals(b.getStringOr("type_id", ""))),
+        AREAS(b -> "field".equals(b.getStringOr("type_id", "")) || "pasture".equals(b.getStringOr("type_id", ""))
+                || "quarry".equals(b.getStringOr("type_id", "")) || "tunnel".equals(b.getStringOr("type_id", ""))),
         INVALID(b -> !b.getBooleanOr("valid", false)),
         NO_CHEST(BuildingsPage::withoutChest),
         FREE_BEDS(b -> b.getBooleanOr("valid", false) && b.getIntOr("beds", 0) > b.getListOrEmpty("residents").size());
@@ -65,6 +66,11 @@ public final class BuildingsPage implements UiPage {
     private Filter filter = Filter.ALL;
     private Sort sort = Sort.TYPE;
     private String selected;
+    /** A building to jump to (right-click on its marker, 15.11.2026) until the list has arrived; and since when. */
+    private String pendingFocus;
+    private long pendingSince;
+    /** How long a right-clicked building is waited for while the list loads. */
+    private static final long PENDING_MS = 5000;
     /** Marker position to select once the list is there ("buildings:at:1, 64, 2"). */
     private String selectAt;
     /** The building whose contents were asked for last. */
@@ -108,6 +114,8 @@ public final class BuildingsPage implements UiPage {
             filter = Filter.ALL;
             selected = hint.substring(3);
             requested = selected; // the server sends its contents already
+            pendingFocus = selected; // the list may not be here yet: keep the choice until it is
+            pendingSince = System.currentTimeMillis();
             return;
         }
         if (hint.startsWith("at:")) {
@@ -131,6 +139,8 @@ public final class BuildingsPage implements UiPage {
             for (int i = 0; i < all.size(); i++) {
                 if (all.getCompoundOrEmpty(i).getStringOr("pos", "").equals(selectAt)) {
                     selected = all.getCompoundOrEmpty(i).getStringOr("id", null);
+                    pendingFocus = selected; // scroll the list to it as well
+                    pendingSince = System.currentTimeMillis();
                 }
             }
             selectAt = null;
@@ -139,7 +149,17 @@ public final class BuildingsPage implements UiPage {
         UiRect body = area.below(TOOLBAR + 4);
         int listWidth = Math.max(120, body.w() * 42 / 100);
         List<CompoundTag> shown = filtered(all);
-        if (shown.stream().noneMatch(b -> b.getStringOr("id", "").equals(selected))) {
+        if (pendingFocus != null) {
+            int index = indexOf(shown, pendingFocus);
+            if (index >= 0) {
+                selected = pendingFocus;
+                list.scrollTo(index);
+                pendingFocus = null;
+            } else if (System.currentTimeMillis() - pendingSince > PENDING_MS) {
+                pendingFocus = null; // not in this village's list after all
+            }
+        }
+        if (pendingFocus == null && shown.stream().noneMatch(b -> b.getStringOr("id", "").equals(selected))) {
             selected = shown.isEmpty() ? null : shown.getFirst().getStringOr("id", null);
         }
         String villageId = data.getStringOr("village_id", "");
@@ -150,6 +170,15 @@ public final class BuildingsPage implements UiPage {
         renderList(ui, body.left(listWidth), shown, all.size());
         CompoundTag building = shown.stream().filter(b -> b.getStringOr("id", "").equals(selected)).findFirst().orElse(null);
         detail.render(ui, body.rightOf(listWidth + 6), building, section, villageId);
+    }
+
+    private static int indexOf(List<CompoundTag> shown, String id) {
+        for (int i = 0; i < shown.size(); i++) {
+            if (shown.get(i).getStringOr("id", "").equals(id)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void renderToolbar(Ui ui, UiRect bar) {

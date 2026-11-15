@@ -12,12 +12,7 @@
     "minecraft:bucket"
   ],
   "products": [
-    "minecraft:beef",
-    "minecraft:leather",
-    "minecraft:porkchop",
-    "minecraft:chicken",
     "minecraft:egg",
-    "minecraft:feather",
     "minecraft:milk_bucket"
   ],
   "nearby": [

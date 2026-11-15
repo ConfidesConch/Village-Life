@@ -22,6 +22,9 @@
     "minecraft:target",
     "minecraft:bell",
     "minecraft:jukebox",
-    "minecraft:flowering_azalea"
+    "minecraft:flowering_azalea",
+    "minecraft:enchanting_table",
+    "minecraft:campfire",
+    "minecraft:soul_campfire"
   ]
 }

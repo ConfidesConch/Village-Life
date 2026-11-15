@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.AbstractBedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.StairBlock;
@@ -21,10 +22,28 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
-/** Places blocks relative to one origin (lower north-west corner, floor level) for the test village (M12a). */
-record TestSite(ServerLevel level, BlockPos origin) {
+/**
+ * Places blocks relative to one origin (lower north-west corner, floor level) for the test village (M12a).
+ * {@code flipped} (owner's wish 15.11.2026: doors towards the street): the building is mirrored front to
+ * back – the origin is then the south-west corner and "north" (local z 0, where the door is) lies south.
+ */
+record TestSite(ServerLevel level, BlockPos origin, boolean flipped) {
+    TestSite(ServerLevel level, BlockPos origin) {
+        this(level, origin, false);
+    }
+
+    /** A building of depth {@code d} whose door faces south, with its north-west corner at {@code northWest}. */
+    static TestSite facingSouth(ServerLevel level, BlockPos northWest, int d) {
+        return new TestSite(level, northWest.offset(0, 0, d - 1), true);
+    }
+
     BlockPos at(int x, int y, int z) {
-        return origin.offset(x, y, z);
+        return origin.offset(x, y, flipped ? -z : z);
+    }
+
+    /** A direction in local terms (north = towards the door) turned into the world direction. */
+    Direction face(Direction local) {
+        return flipped && local.getAxis() == Direction.Axis.Z ? local.getOpposite() : local;
     }
 
     void set(int x, int y, int z, BlockState state) {
@@ -140,16 +159,59 @@ record TestSite(ServerLevel level, BlockPos origin) {
     }
 
     void door(int x) {
-        BlockState door = Blocks.OAK_DOOR.defaultBlockState();
+        BlockState door = Blocks.OAK_DOOR.defaultBlockState().setValue(DoorBlock.FACING, face(Direction.NORTH));
         set(x, 1, 0, door.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
         set(x, 2, 0, door.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
     }
 
     /** A bed whose head is at z and foot at z + 1 (the default facing). */
     void bed(int x, int z, DyeColor color) {
-        BlockState bed = Blocks.BED.pick(color).defaultBlockState();
-        set(x, 1, z, bed.setValue(AbstractBedBlock.PART, BedPart.HEAD));
-        set(x, 1, z + 1, bed.setValue(AbstractBedBlock.PART, BedPart.FOOT));
+        bed(x, 1, z, color);
+    }
+
+    /** A bed on any storey ({@code y} = height above the ground floor). */
+    void bed(int x, int y, int z, DyeColor color) {
+        BlockState bed = Blocks.BED.pick(color).defaultBlockState().setValue(AbstractBedBlock.FACING, face(Direction.NORTH));
+        set(x, y, z, bed.setValue(AbstractBedBlock.PART, BedPart.HEAD));
+        set(x, y, z + 1, bed.setValue(AbstractBedBlock.PART, BedPart.FOOT));
+    }
+
+    /**
+     * A two-storey house (owner's wish 15.11.2026): 7 × 7, ground floor and upper floor with two beds each,
+     * a ladder in the back corner through a hole in the middle floor, windows on both floors. One building
+     * with 4 beds for the building scan.
+     */
+    void twoStoreyHouse(BlockState walls, BlockState roof, DyeColor color) {
+        house(7, 9, 7, walls, roof);
+        BlockState glass = Blocks.GLASS.defaultBlockState();
+        BlockState floor = Blocks.SPRUCE_PLANKS.defaultBlockState();
+        for (int x = 1; x <= 5; x++) {
+            for (int z = 1; z <= 5; z++) {
+                boolean hole = x == 1 && z == 5;
+                set(x, 4, z, hole ? Blocks.AIR.defaultBlockState() : x == 3 && z == 3 ? Blocks.GLOWSTONE.defaultBlockState() : floor);
+            }
+            if (x >= 2 && x <= 4 && x % 2 == 0) {
+                set(x, 6, 6, glass);
+            }
+        }
+        for (int z = 2; z <= 4; z += 2) {
+            set(0, 6, z, glass);
+            set(6, 6, z, glass);
+        }
+        BlockState ladder = Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, face(Direction.NORTH));
+        for (int y = 1; y <= 4; y++) {
+            set(1, y, 5, ladder);
+        }
+        bed(4, 1, 1, color);
+        bed(5, 1, 1, color);
+        bed(4, 5, 1, color);
+        bed(5, 5, 1, color);
+        set(3, 7, 3, Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true));
+    }
+
+    /** Ground block in front of the door, {@code k} blocks out (local z = −k). */
+    BlockPos front(int doorX, int k) {
+        return at(doorX, 0, -k);
     }
 
     /**
@@ -166,7 +228,7 @@ record TestSite(ServerLevel level, BlockPos origin) {
         }
         furnish();
         if (doorX >= 0) {
-            set(doorX, 3, -1, marker.setValue(BuildingMarkerBlock.FACING, Direction.NORTH));
+            set(doorX, 3, -1, marker.setValue(BuildingMarkerBlock.FACING, face(Direction.NORTH)));
             return at(doorX, 3, -1);
         }
         set(x, 1, z, marker);

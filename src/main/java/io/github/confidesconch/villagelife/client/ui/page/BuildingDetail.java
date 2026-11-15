@@ -26,7 +26,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
  */
 final class BuildingDetail {
     private static final int LINE = 11;
-    private static final String[] TYPES = {"house", "storage", "workplace", "field", "pasture"};
+    private static final String[] TYPES = {"house", "storage", "workplace", "field", "pasture", "quarry", "tunnel"};
 
     private final ScrollPanel scroll = new ScrollPanel();
     private String shownId;
@@ -63,7 +63,7 @@ final class BuildingDetail {
             y += 20;
         }
         y = facts(ui, x, y + 2, w, b);
-        y = workArea(ui, x, y, w, b, section, manage, villageId, id);
+        y = workArea(ui, x, y, w, b);
         y = people(ui, x, y, w, b.getListOrEmpty("residents"), "villagelife.book.building.lives_here");
         y = people(ui, x, y, w, b.getListOrEmpty("workers"), "villagelife.book.building.works_here");
         if (b.getIntOr("containers", 0) > 0) {
@@ -91,7 +91,11 @@ final class BuildingDetail {
 
     private static int facts(Ui ui, int x, int y, int w, CompoundTag b) {
         String type = b.getStringOr("type_id", "");
-        if (type.equals("field") || type.equals("pasture")) { // M21d: an open area has only a size
+        if (type.equals("tunnel")) { // M28d: a sign on rock, no size
+            y += ui.paragraph(Component.translatable("villagelife.book.building.tunnel_tip"), x, y + 2, w, UiTheme.INK_DIM);
+            return y + 6;
+        }
+        if (type.equals("field") || type.equals("pasture") || type.equals("quarry")) { // M21d: an open area has only a size
             y = row(ui, x, y, w, "area", String.valueOf(b.getIntOr("volume", 0)));
             y += ui.paragraph(Component.translatable("villagelife.book.building." + type + "_tip"), x, y + 2, w, UiTheme.INK_DIM);
             return y + 6;
@@ -129,43 +133,25 @@ final class BuildingDetail {
         return y + LINE + 3;
     }
 
-    /** "◀ Pasture ▶" for professions that need a work area (M13c); missing area in red. */
-    private static int workArea(Ui ui, int x, int y, int w, CompoundTag b, CompoundTag section, boolean manage,
-                                String villageId, String id) {
-        boolean needed = b.getBooleanOr("needs_area", false);
-        int current = b.getIntOr("work_area", -1);
-        if (!needed && current < 0) {
+    /**
+     * The marked area a profession works in (M13c; M28b: only by sign – pasture or quarry with its marker
+     * position); missing area in red with a hint how to mark one.
+     */
+    private static int workArea(Ui ui, int x, int y, int w, CompoundTag b) {
+        if (!b.getBooleanOr("needs_area", false)) {
             return y;
         }
         y = heading(ui, x, y, w, Component.translatable("villagelife.book.building.work_area"));
-        ListTag zones = section.getListOrEmpty("zones");
-        List<Integer> choices = new ArrayList<>();
-        choices.add(-1);
-        for (int i = 0; i < zones.size(); i++) {
-            choices.add(zones.getCompoundOrEmpty(i).getIntOr("id", -1));
+        String marker = b.getStringOr("auto_area", "");
+        if (!marker.isEmpty()) {
+            String type = b.getStringOr("auto_area_type", "pasture");
+            ui.text(Component.translatable("villagelife.book.building.work_area." + type, marker), new UiRect(x, y, w, 16), UiTheme.INK, 0);
+            return y + 24;
         }
-        int index = Math.max(0, choices.indexOf(current));
-        boolean canChange = manage && choices.size() > 1;
-        int previous = choices.get((index - 1 + choices.size()) % choices.size());
-        int next = choices.get((index + 1) % choices.size());
-        ui.button(new UiRect(x, y, 16, 16), Component.literal("◀"), canChange, () -> send(villageId, id, "area:" + area(previous)));
-        ui.button(new UiRect(x + w - 16, y, 16, 16), Component.literal("▶"), canChange, () -> send(villageId, id, "area:" + area(next)));
-        String pasture = b.getStringOr("auto_area", ""); // M21d: nearest marked pasture, used while no zone is chosen
-        Component shown = current >= 0 ? Component.literal(b.getStringOr("work_area_name", "?"))
-                : !pasture.isEmpty() ? Component.translatable("villagelife.book.building.work_area.pasture", pasture)
-                : Component.translatable("villagelife.book.building.work_area.none");
-        boolean missing = current < 0 && needed && pasture.isEmpty();
-        ui.text(shown, new UiRect(x + 20, y, w - 40, 16), missing ? UiTheme.BAD_INK : UiTheme.INK, 0);
+        ui.text(Component.translatable("villagelife.book.building.work_area.none"), new UiRect(x, y, w, 16), UiTheme.BAD_INK, 0);
         y += 20;
-        if (missing) {
-            y += ui.paragraph(Component.translatable(zones.isEmpty() ? "villagelife.book.building.work_area.draw_first"
-                    : "villagelife.book.building.work_area.missing"), x, y, w, UiTheme.BAD_INK);
-        }
+        y += ui.paragraph(Component.translatable("villagelife.book.building.work_area.missing"), x, y, w, UiTheme.BAD_INK);
         return y + 4;
-    }
-
-    private static String area(int zoneId) {
-        return zoneId < 0 ? "none" : String.valueOf(zoneId);
     }
 
     /** Names of residents or workers; a click opens the resident in "Residents". */

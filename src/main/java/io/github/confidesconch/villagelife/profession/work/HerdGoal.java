@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import io.github.confidesconch.villagelife.building.AreaService;
 import io.github.confidesconch.villagelife.building.Building;
-import io.github.confidesconch.villagelife.building.BuildingType;
+import io.github.confidesconch.villagelife.building.PastureKind;
 import io.github.confidesconch.villagelife.profession.work.HerdArea.Herd;
 import io.github.confidesconch.villagelife.profession.work.HerdRules.Task;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.village.Village;
-import io.github.confidesconch.villagelife.village.VillageZone;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -31,9 +30,10 @@ import net.minecraft.world.phys.Vec3;
  * Shared work of herders (shepherd M13c, breeder M13d): looks after the animals inside the work area
  * the owner assigned to the workplace ({@link HerdArea}). In this order: brings escaped animals of its
  * herd back ({@link HerdLure}), picks up loose products (e.g. eggs), does the profession's own task
- * (shearing, milking), then – for each kind of animal separately – slaughters adults above the
- * village's herd limit or feeds a pair to breed ({@link HerdRules}). Picks up what falls (wool, meat,
- * leather) and delivers it like every worker. Without a work area it reports the problem in the book.
+ * (shearing, milking), then – for each kind of animal separately – feeds a pair to breed up to the
+ * village's herd limit ({@link HerdRules}). Slaughtering is the butcher's job since M27 (owner's choice
+ * "only the butcher"): without a butcher the herds simply stop growing at the limit. Picks up what falls
+ * (wool, eggs) and delivers it like every worker. Without a work area it reports the problem in the book.
  */
 public abstract class HerdGoal<T extends Animal> extends WorkGoal {
     private static final double REACH = 2.2;
@@ -46,19 +46,25 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
     private static final int IGNORE_TICKS = 1200;
 
     /** What the herder does with its target animal. */
-    protected enum Action { SPECIAL, CULL, FEED, RETURN }
+    protected enum Action { SPECIAL, FEED, RETURN, RELOCATE }
 
     /** Something to fetch from storage before the own task (e.g. empty buckets). */
     protected record Supply(String key, Predicate<ItemStack> wanted, int amount) {}
 
-    private enum Phase { DELIVER, FETCH, TO_TARGET, COLLECT, LEAD }
+    private enum Phase { DELIVER, FETCH, TO_TARGET, COLLECT, LEAD, GATE }
 
     private final Class<T> animalClass;
+    private final String herderProfession;
     private final Map<UUID, Long> ignored = new HashMap<>();
     private Phase phase;
     private Action action;
+    /** The area the current task belongs to (escaped animal, misplaced animal). */
+    private HerdArea current;
     /** The animal (or, if {@code action} is null, the loose item) the herder walks to. */
     private Entity target;
+    /** An open pasture gate the herder walks to and closes (owner's report 15.11.2026). */
+    private BlockPos gate;
+    private final Map<BlockPos, Long> ignoredGates = new HashMap<>();
     /** The second animal of a breeding pair, fed right after the first. */
     private T partner;
     /** Bringing an escaped animal back (lure, or carry as fallback), or null. */
@@ -73,6 +79,7 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
                        Item basicTool, Class<T> animalClass) {
         super(resident, speedModifier, profession, toolTag, basicTool);
         this.animalClass = animalClass;
+        this.herderProfession = profession;
     }
 
     /** True for the animals this herder looks after (default: every animal of the class). */
@@ -82,6 +89,14 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
 
     /** Feed this herder fetches from storage and keeps a few of (each kind of animal still picks its own). */
     protected abstract boolean isFeed(ItemStack stack);
+
+    /**
+     * M28b (owner's choice "B"): false if somebody else feeds, breeds and gathers this herd; the herder then
+     * only does its own task (e.g. the shepherd shears while the village has a breeder).
+     */
+    protected boolean caresForHerd() {
+        return true;
+    }
 
     /** The animal for the profession's own task (e.g. a sheep with wool), or null. */
     protected abstract T specialTarget(List<T> adults);
@@ -99,11 +114,6 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
         return true;
     }
 
-    /** Which adult to slaughter first (e.g. a sheared sheep); default: the first one. */
-    protected T cullCandidate(List<T> adults) {
-        return adults.getFirst();
-    }
-
     /** Items lying in the area that the herder picks up (e.g. eggs); default: none. */
     protected boolean isLooseProduct(ItemStack stack) {
         return false;
@@ -119,7 +129,7 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
         if (!isWorkTime() || !(resident.level() instanceof ServerLevel level)) {
             return false;
         }
-        if (area() == null) {
+        if (areas(level).isEmpty()) {
             resident.brain().setWorkIssue(ISSUE_NO_WORK_AREA);
             return startDeliverIfNeeded();
         }
@@ -160,6 +170,7 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
         lure = null;
         phase = null;
         target = null;
+        gate = null;
         partner = null;
         super.stop();
     }
@@ -169,25 +180,11 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
         return isFeed(stack) ? FEED_TO_KEEP : 0;
     }
 
-    /** M21d: the marked pasture a herder of {@code profession} uses while no zone is drawn for its workplace. */
-    public static java.util.Optional<Building> autoPasture(Village village, Building workplace, String profession) {
-        boolean herder = ShepherdGoal.PROFESSION.equals(profession) || BreederGoal.PROFESSION.equals(profession);
-        return herder ? AreaService.nearest(village, BuildingType.PASTURE, workplace.center()) : java.util.Optional.empty();
-    }
-
-    /** The assigned work zone; M21d: without one, the nearest pasture marked with a marker. */
-    private HerdArea area() {
+    /** The herder's areas (M28b): its own pastures (by kind) and the nearest open pasture. */
+    private List<HerdArea> areas(ServerLevel level) {
+        Village village = resident.brain().village();
         Building workplace = workplace();
-        if (workplace == null) {
-            return null;
-        }
-        VillageZone zone = workArea();
-        if (zone != null) {
-            return new HerdArea(zone, workplace.center().getY(), workplace.id().toString());
-        }
-        return AreaService.nearest(resident.brain().village(), BuildingType.PASTURE, workplace.center())
-                .map(pasture -> new HerdArea(AreaService.asZone(pasture), pasture.center().getY(), workplace.id().toString()))
-                .orElse(null);
+        return village == null || workplace == null ? List.of() : HerdPastures.areasOf(level, village, workplace, herderProfession);
     }
 
     private boolean usable(T animal) {
@@ -196,25 +193,53 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
 
     // ---- choosing ------------------------------------------------------------------------------
 
-    /** Escaped animals, loose products, own task (fetching supplies first), then per kind: too many animals, breeding. */
+    /**
+     * Escaped animals, loose products, misplaced animals (M28b), own task (fetching supplies first), then
+     * per area and kind: breeding up to the limit.
+     */
     private boolean chooseWork(ServerLevel level) {
-        HerdArea area = area();
-        if (area == null) {
+        List<HerdArea> areas = areas(level);
+        if (areas.isEmpty()) {
             return false;
         }
         long now = level.getGameTime();
         ignored.values().removeIf(until -> until < now);
-        T escaped = area.escaped(level, animalClass, this::usable);
-        if (escaped != null) {
-            return approach(escaped, null, Action.RETURN);
+        ignoredGates.values().removeIf(until -> until < now);
+        boolean cares = caresForHerd(); // M28b: otherwise only the profession's own task (shearing)
+        for (HerdArea area : cares ? areas : List.<HerdArea>of()) { // first shut what somebody left open, so no more animals get out
+            BlockPos open = HerdLure.openGate(level, area);
+            if (open != null && !ignoredGates.containsKey(open)) {
+                gate = open;
+                setPhase(Phase.GATE);
+                return true;
+            }
         }
-        ItemEntity loose = area.loose(level, item -> isLooseProduct(item.getItem()) && !ignored.containsKey(item.getUUID()));
-        if (loose != null) {
-            return approach(loose, null, null);
+        for (HerdArea area : cares ? areas : List.<HerdArea>of()) {
+            T escaped = area.escaped(level, animalClass, this::usable);
+            if (escaped != null) {
+                current = area;
+                return approach(escaped, null, Action.RETURN);
+            }
         }
-        Map<?, Herd<T>> herds = area.herds(level, animalClass, this::usable);
+        Set<PastureKind> ownPastures = HerdPastures.ownPastures(level, resident.brain().village());
+        for (HerdArea area : areas) {
+            ItemEntity loose = area.loose(level, item -> isLooseProduct(item.getItem()) && !ignored.containsKey(item.getUUID()));
+            if (loose != null) {
+                return approach(loose, null, null);
+            }
+            Animal wrong = !cares ? null : area.misplaced(level, animal -> !ignored.containsKey(animal.getUUID()), ownPastures);
+            if (wrong != null) {
+                current = area;
+                return approach(wrong, null, Action.RELOCATE);
+            }
+        }
+        List<Map<?, Herd<T>>> herdsPerArea = new ArrayList<>();
         List<T> adults = new ArrayList<>();
-        herds.values().forEach(herd -> adults.addAll(herd.adults));
+        for (HerdArea area : areas) {
+            Map<?, Herd<T>> herds = area.herds(level, animalClass, this::usable);
+            herdsPerArea.add(herds);
+            herds.values().forEach(herd -> adults.addAll(herd.adults));
+        }
         Supply supply = neededSupply(adults);
         if (supply != null && mayFetch(level, supply.key())) {
             return fetch(supply);
@@ -223,22 +248,24 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
         if (special != null) {
             return approach(special, null, Action.SPECIAL);
         }
+        if (!cares) {
+            return false;
+        }
         int limit = resident.brain().village() == null ? 8 : resident.brain().village().settings().herdLimit();
-        for (Herd<T> herd : herds.values()) {
-            if (herd.adults.isEmpty()) {
-                continue;
-            }
-            T sample = herd.adults.getFirst();
-            Predicate<ItemStack> food = sample::isFood;
-            boolean carried = resident.carriedCount(food) > 0;
-            String key = "feed:" + sample.getType().getDescriptionId();
-            Task task = HerdRules.next(herd.adults.size(), herd.young, herd.ready.size(), limit, carried || mayFetch(level, key));
-            if (task == Task.CULL) {
-                return approach(cullCandidate(herd.adults), null, Action.CULL);
-            }
-            if (task == Task.BREED) {
-                return carried ? approach(herd.ready.get(0), herd.ready.get(1), Action.FEED)
-                        : fetch(new Supply(key, food, FEED_TO_KEEP));
+        for (Map<?, Herd<T>> herds : herdsPerArea) {
+            for (Herd<T> herd : herds.values()) {
+                if (herd.adults.isEmpty()) {
+                    continue;
+                }
+                T sample = herd.adults.getFirst();
+                Predicate<ItemStack> food = sample::isFood;
+                boolean carried = resident.carriedCount(food) > 0;
+                String key = "feed:" + sample.getType().getDescriptionId();
+                Task task = HerdRules.next(herd.adults.size(), herd.young, herd.ready.size(), limit, carried || mayFetch(level, key));
+                if (task == Task.BREED) { // CULL: the butcher's job (M27)
+                    return carried ? approach(herd.ready.get(0), herd.ready.get(1), Action.FEED)
+                            : fetch(new Supply(key, food, FEED_TO_KEEP));
+                }
             }
         }
         return false;
@@ -271,6 +298,7 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
             case TO_TARGET -> walkToTarget(level);
             case COLLECT -> collect(level);
             case LEAD -> lead(level);
+            case GATE -> closeGate(level);
             case FETCH -> {
                 if (fetchStep(level, fetching.key(), fetching.wanted(), fetching.amount()) != FetchStatus.RUNNING) {
                     next(level);
@@ -281,6 +309,25 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
                     next(level);
                 }
             }
+        }
+    }
+
+    /** Walks to the open gate and closes it; gives up for a while if it cannot be reached. */
+    private void closeGate(ServerLevel level) {
+        if (gate.closerToCenterThan(resident.position(), REACH + 0.8)) {
+            resident.getNavigation().stop();
+            resident.getLookControl().setLookAt(gate.getX() + 0.5, gate.getY() + 0.5, gate.getZ() + 0.5);
+            if (HerdLure.closeGate(level, gate)) {
+                swing();
+            }
+            gate = null;
+            next(level);
+        } else if (phaseTicks > GIVE_UP_TICKS) {
+            ignoredGates.put(gate, level.getGameTime() + IGNORE_TICKS);
+            gate = null;
+            next(level);
+        } else if (phaseTicks % REPATH_TICKS == 1) {
+            resident.getNavigation().moveTo(gate.getX() + 0.5, gate.getY(), gate.getZ() + 0.5, speedModifier);
         }
     }
 
@@ -296,6 +343,8 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
                 dropPos = target.position();
                 setPhase(Phase.COLLECT);
                 phaseTicks = COLLECT_DELAY_TICKS;
+            } else if (action == Action.RELOCATE) {
+                relocate(level, (Animal) target);
             } else {
                 act(level, animalClass.cast(target));
             }
@@ -325,12 +374,8 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
                     next(level);
                 }
             }
-            case CULL -> {
-                animal.hurtServer(level, level.damageSources().mobAttack(resident), Float.MAX_VALUE);
-                startCollecting(animal);
-            }
             case RETURN -> {
-                lure = new HerdLure(level, resident, animal, area());
+                lure = new HerdLure(level, resident, animal, current);
                 setPhase(Phase.LEAD);
             }
             case FEED -> {
@@ -350,14 +395,32 @@ public abstract class HerdGoal<T extends Animal> extends WorkGoal {
 
     /** Brings the escaped animal back ({@link HerdLure}); afterwards the herder holds its tool again. */
     private void lead(ServerLevel level) {
-        if (lure == null || area() == null || lure.tick(level, speedModifier) == HerdLure.Status.DONE) {
-            if (lure != null && area() == null) {
+        if (lure == null || current == null || lure.tick(level, speedModifier) == HerdLure.Status.DONE) {
+            if (lure != null && current == null) {
                 lure.finish(level);
             }
             lure = null;
             showTool();
             next(level);
         }
+    }
+
+    /**
+     * M28b: carries an animal that is in the wrong pasture over to one of its kind (puff of dust, like
+     * lifting it over a gate); if there is none, sets it free outside the pasture's gate.
+     */
+    private void relocate(ServerLevel level, Animal animal) {
+        swing();
+        HerdArea home = current == null ? null : HerdPastures.homeFor(level, resident.brain().village(), animal, current);
+        if (home != null) {
+            HerdLure.carry(level, animal, home.middle(level));
+            home.adopt(animal);
+        } else if (current != null) {
+            HerdLure.carry(level, animal, HerdLure.outside(level, current));
+            HerdArea.release(animal);
+        }
+        current = null;
+        next(level);
     }
 
     private void startCollecting(T animal) {

@@ -43,7 +43,7 @@ final class StressVillage {
     /** Sites end 2 blocks inside the city border (radius 96). */
     private static final int OUTER = 94;
     private static final int CLEAR_HEIGHT = 12;
-    private static final int TEST_VILLAGE_BEDS = 112;
+    private static final int TEST_VILLAGE_BEDS = TestVillage.HOUSE_BEDS;
     private static final int BUNK_BEDS = 12;
 
     private enum Kind { FARM, BAKERY, KITCHEN, SMITHY, CARPENTRY, TAVERN, GUARDHOUSE }

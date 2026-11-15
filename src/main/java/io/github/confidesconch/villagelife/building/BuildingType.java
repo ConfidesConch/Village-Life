@@ -15,7 +15,11 @@ public enum BuildingType implements StringRepresentable {
     /** M21d: a fenced field under open sky; "volume" is its area in columns. */
     FIELD("field", new BuildingRequirement(9, 0, 0, 0, 0)),
     /** M21d: a fenced pasture for the herders; "volume" is its area in columns. */
-    PASTURE("pasture", new BuildingRequirement(16, 0, 0, 0, 0));
+    PASTURE("pasture", new BuildingRequirement(16, 0, 0, 0, 0)),
+    /** M28b: a fenced quarry for the miner (owner's choice "fence + sign" instead of map zones); "volume" is its area. */
+    QUARRY("quarry", new BuildingRequirement(9, 0, 0, 0, 0)),
+    /** M28d: a tunnel sign hung on a rock face; the miner digs into the rock behind it. */
+    TUNNEL("tunnel", new BuildingRequirement(1, 0, 0, 0, 0));
 
     public static final Codec<BuildingType> CODEC = StringRepresentable.fromEnum(BuildingType::values);
 
@@ -27,9 +31,9 @@ public enum BuildingType implements StringRepresentable {
         this.defaultRequirement = defaultRequirement;
     }
 
-    /** True for fenced open areas (field, pasture) instead of rooms (M21d). */
+    /** True for fenced open areas (field, pasture, quarry) instead of rooms (M21d). */
     public boolean isArea() {
-        return this == FIELD || this == PASTURE;
+        return this == FIELD || this == PASTURE || this == QUARRY;
     }
 
     /** Built-in fallback, used when no data pack file exists for this type. */

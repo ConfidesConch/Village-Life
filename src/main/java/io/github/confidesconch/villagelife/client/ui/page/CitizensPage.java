@@ -55,12 +55,18 @@ public final class CitizensPage implements UiPage {
     /** Sort orders. */
     enum Sort { NAME, JOB, MOOD, SINCE }
 
+    /** How long a right-clicked resident is waited for while the list loads. */
+    private static final long PENDING_MS = 5000;
+
     private final TextField search = new TextField(32);
     private final ScrollList list = new ScrollList();
     private final CitizenDetail detail = new CitizenDetail();
     private Filter filter = Filter.ALL;
     private Sort sort = Sort.NAME;
     private String selected;
+    /** A resident to jump to (right-click, 15.11.2026) until the residents list has arrived; and since when. */
+    private String pendingFocus;
+    private long pendingSince;
 
     @Override
     public String id() {
@@ -89,10 +95,12 @@ public final class CitizensPage implements UiPage {
 
     @Override
     public void focus(String hint) {
-        if (hint.startsWith("id=")) { // a resident chosen elsewhere, e.g. in a building (M21b5)
+        if (hint.startsWith("id=")) { // a resident chosen elsewhere, e.g. in a building (M21b5) or right-clicked
             filter = Filter.ALL;
             search.setValue("");
             selected = hint.substring(3);
+            pendingFocus = selected; // the list may not be here yet: keep the choice until it is
+            pendingSince = System.currentTimeMillis();
             list.reset();
             return;
         }
@@ -113,7 +121,17 @@ public final class CitizensPage implements UiPage {
         int listWidth = Math.max(110, body.w() * 40 / 100);
         UiRect left = body.left(listWidth);
         List<CompoundTag> shown = filtered(data.getCompoundOrEmpty("residents").getListOrEmpty("list"));
-        if (shown.stream().noneMatch(r -> r.getStringOr("id", "").equals(selected))) {
+        if (pendingFocus != null) {
+            int index = indexOf(shown, pendingFocus);
+            if (index >= 0) {
+                selected = pendingFocus;
+                list.scrollTo(index);
+                pendingFocus = null;
+            } else if (System.currentTimeMillis() - pendingSince > PENDING_MS) {
+                pendingFocus = null; // not in this village's list after all
+            }
+        }
+        if (pendingFocus == null && shown.stream().noneMatch(r -> r.getStringOr("id", "").equals(selected))) {
             selected = shown.isEmpty() ? null : shown.getFirst().getStringOr("id", null);
         }
         renderList(ui, left, shown, data.getCompoundOrEmpty("residents").getListOrEmpty("list").size());
@@ -181,6 +199,15 @@ public final class CitizensPage implements UiPage {
             u.text(jobName(c), row.rightOf(nameWidth + 2).inset(0, 0, 2, 0), UiTheme.TEXT_DIM, 1);
             u.clickable(row, () -> selected = id);
         });
+    }
+
+    private static int indexOf(List<CompoundTag> shown, String id) {
+        for (int i = 0; i < shown.size(); i++) {
+            if (shown.get(i).getStringOr("id", "").equals(id)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /** Search, filter and sort; a new list every frame is cheap for a few hundred residents. */

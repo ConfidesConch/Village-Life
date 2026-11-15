@@ -23,6 +23,10 @@ public final class MarketSystem {
         NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class,
                 event -> ModProfiler.time(ModProfiler.VILLAGE_LIFE, () -> CaravanService.onServerTick(event)));
         BookSections.register("contracts", ContractService::write);
+        EnchantingService.init(); // M26: enchanting for players
+        NeoForge.EVENT_BUS.addListener(StallOffers::onAddReloadListeners); // M28c: the daily market trader
+        NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class,
+                event -> ModProfiler.time(ModProfiler.VILLAGE_LIFE, () -> StallService.onServerTick(event)));
         NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class,
                 event -> ModProfiler.time(ModProfiler.VILLAGE_LIFE, () -> ContractService.onServerTick(event)));
     }

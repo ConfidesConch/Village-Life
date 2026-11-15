@@ -2,7 +2,7 @@
 
 > A Minecraft mod where you **build your village yourself** – and residents **live** in it.
 
-**Version:** 1.3.1 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
+**Version:** 1.5.0 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
 
 ---
 
@@ -16,7 +16,7 @@ find work, follow a daily routine, make friends, start families – and turn you
 
 **Free building**
 - Village center block founds a village; building markers register houses, storehouses, workplaces, fenced
-  fields and pastures. Rooms, doors, beds, chests and workstations are detected automatically, rebuilds are
+  fields, pastures and quarries, and tunnels on a rock face. A pasture can be set to one kind of animal. Rooms, doors, beds, chests and workstations are detected automatically, rebuilds are
   noticed, multi-storey buildings work.
 - Clear feedback when a building is not valid, and a marker that glows purple when it is.
 
@@ -26,14 +26,18 @@ find work, follow a daily routine, make friends, start families – and turn you
 - They walk, open doors and gates, climb ladders, eat from storage and sleep in their own beds. Newcomers
   arrive when there is room and bring provisions.
 
-**20 professions** – each with a vanilla workstation
+**22 professions** – each with a vanilla workstation
 - Lumberjack, farmer, fisherman, shepherd, breeder, miner, cook, smith, baker, carpenter, storekeeper,
-  merchant, innkeeper, teacher, guard, archer, captain, bard, healer, druid.
+  merchant, innkeeper, teacher, guard, archer, captain, bard, healer, druid, enchanter, butcher.
 - Production chains: craftsmen work until a stock level is reached, the storekeeper moves materials and
-  products, the smith smelts, forges and repairs tools.
+  products, the smith smelts, forges and repairs tools – and forges swords and armor for your guards.
+- The breeder keeps every animal in its own pasture, the shepherd shears, the butcher keeps the herds at
+  their limit. The miner digs a quarry or a tunnel with stairs, corridors and torches.
+- The enchanter enchants the village's tools (faster workers) – and yours, for emeralds.
 
 **Economy and trade**
 - Market with emeralds and supply-and-demand prices, visiting trade caravans, a village treasury.
+- A market trader at the village center every day with rare goods for players.
 - **Trade contracts between villages** – also between different players – with deliveries on the road,
   escorts and bandit ambushes.
 
@@ -53,6 +57,8 @@ find work, follow a daily routine, make friends, start families – and turn you
 **Village window** (key **B**)
 - Overview with problems and events, residents, jobs, buildings, economy, a parchment-style map that remembers
   explored areas, defence, administration and your character – everything in one place.
+- Right-click a resident or a building sign and the window jumps right to it.
+- `/playtime` and `/playtime top` show how long you (and the others online) have played.
 
 **Multiplayer** and dedicated servers are supported from the start. 100+ residents per village run without
 noticeable lag.
@@ -60,7 +66,7 @@ noticeable lag.
 ## Installation
 
 1. Install Minecraft Java Edition **26.3** with **NeoForge 26.3.0.100** or newer (26.3.x).
-2. Put `villagelife-26.3-1.3.1.jar` into the `mods` folder – on the server **and** on every player's game.
+2. Put `villagelife-26.3-1.5.0.jar` into the `mods` folder – on the server **and** on every player's game.
 3. Start the game. The village center and building markers are in the creative tab "Village Life" and can be
    crafted in survival:
    - **Village center:** planks in the corners, cobblestone (or other stone) on the sides, paper in the middle.
@@ -77,7 +83,8 @@ noticeable lag.
    above the door works fine – and right-click it until it shows "House".
 3. Build a storehouse with a chest, put some food (e.g. bread) inside, give it a marker set to "Storage".
 4. The first resident soon moves in. For work: a room with a workstation, e.g. a composter for a farmer, with
-   a marker set to "Workplace", and a fenced field with a marker on its fence set to "Field".
+   a marker set to "Workplace", and a fenced field with a marker on its fence set to "Field" (herders need a
+   fenced "Pasture", the miner a fenced "Quarry" or a "Tunnel" marker on a rock face).
 5. Press **B** to open the village window – you see and control everything there.
 
 For a quick look in a flat creative world with cheats: `/villagelife debug testvillage` builds a complete

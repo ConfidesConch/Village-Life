@@ -33,14 +33,23 @@ public final class AreaService {
     static final String UNLOADED = "villagelife.building.problem.unloaded";
     private static final String OPEN = "villagelife.building.problem.area_open";
     private static final String TOO_SMALL = "villagelife.building.problem.area_too_small";
+    private static final String NO_ROCK = "villagelife.building.problem.tunnel_no_rock";
     private static final String ALREADY_REGISTERED = "villagelife.building.problem.already_registered";
 
     /** Scans the area around the marker and returns the record to store (valid, or with the reason). */
     static Building build(ServerLevel level, BlockPos markerPos, BuildingType type, Optional<Building> previous) {
         int maxArea = SyncedConfig.MAX_BUILDING_VOLUME.getAsInt();
-        AreaScanner.Result scan = scan(level, markerPos, maxArea);
         UUID id = previous.map(Building::id).orElseGet(UUID::randomUUID);
         long now = level.getGameTime();
+        AreaScanner.Result scan = scan(level, markerPos, maxArea);
+        Optional<Building> dug = previous.filter(b -> type == BuildingType.QUARRY && b.type() == type && b.isValid());
+        if (dug.isPresent() && scan.failure() != AreaScanner.Failure.UNLOADED
+                && (!scan.isSuccess() || scan.columns().size() < dug.get().interiorVolume())) {
+            // M28b: the pit breaks up the ground, so a valid quarry keeps its bounds unless the fence grew
+            Building old = dug.get();
+            return new Building(id, type, markerPos, old.min(), old.max(), old.interiorVolume(), List.of(), List.of(),
+                    List.of(), List.of(), now, Optional.empty());
+        }
         if (!scan.isSuccess()) {
             // keep the last known bounds so later changes nearby still trigger a rescan
             BlockPos min = previous.map(Building::min).orElse(markerPos);
@@ -58,6 +67,21 @@ public final class AreaService {
                 ? Optional.of(new Problem(ALREADY_REGISTERED, 0))
                 : area < required ? Optional.of(new Problem(TOO_SMALL, required)) : Optional.empty();
         return new Building(id, type, markerPos, min, max, area, List.of(), List.of(), List.of(), List.of(), now, problem);
+    }
+
+    /**
+     * M28d: a tunnel sign is valid when it hangs on rock (the block behind it is solid), or once it was
+     * valid (digging empties the block behind it). Its bounds are the marker itself.
+     */
+    static Building tunnel(ServerLevel level, BlockPos markerPos, Optional<Building> previous) {
+        UUID id = previous.map(Building::id).orElseGet(UUID::randomUUID);
+        BlockState marker = level.getBlockState(markerPos);
+        boolean onRock = marker.is(ModBlocks.BUILDING_MARKER.get()) && level.getBlockState(
+                markerPos.relative(marker.getValue(BuildingMarkerBlock.FACING).getOpposite())).isSolid();
+        boolean wasValid = previous.filter(b -> b.type() == BuildingType.TUNNEL && b.isValid()).isPresent();
+        Optional<Problem> problem = onRock || wasValid ? Optional.empty() : Optional.of(new Problem(NO_ROCK, 0));
+        return new Building(id, BuildingType.TUNNEL, markerPos, markerPos, markerPos, 1, List.of(), List.of(), List.of(),
+                List.of(), level.getGameTime(), problem);
     }
 
     /** The columns of a registered area as they are now; empty if it is open, unloaded or not an area. */

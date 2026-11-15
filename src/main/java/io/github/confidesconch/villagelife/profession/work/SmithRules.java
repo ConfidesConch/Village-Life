@@ -6,9 +6,10 @@ import java.util.Optional;
 /**
  * What the smith makes and what it costs (M13g, Minecraft-free, unit tested). The smith makes better
  * tools for the village's professions: the kind follows from the profession's basic tool (a wooden
- * axe → axes), the material is iron or copper (shears only from iron). Costs as in Minecraft's
- * crafting recipes. He keeps {@link #RESERVE} of each needed tool in storage – workers take one when
- * it is better than theirs, so the smith stops once everybody has one.
+ * axe → axes), the material is diamond (if there are diamonds, M28a), iron or copper (shears only from
+ * iron). M28a: for villages with defenders also armor (helmet, chestplate, leggings, boots). Costs as in
+ * Minecraft's crafting recipes. He keeps {@link #RESERVE} of each needed piece in storage – workers take
+ * one when it is better than theirs (guards: for an empty armor slot), so he stops once everybody has one.
  */
 public final class SmithRules {
     private SmithRules() {}
@@ -16,7 +17,12 @@ public final class SmithRules {
     public static final int RESERVE = 2;
 
     public enum Kind {
-        PICKAXE(3, 2), AXE(3, 2), HOE(2, 2), SWORD(2, 1), SHEARS(2, 0);
+        PICKAXE(3, 2), AXE(3, 2), HOE(2, 2), SWORD(2, 1), SHEARS(2, 0),
+        /** M28a: armor for the defenders. */
+        HELMET(5, 0), CHESTPLATE(8, 0), LEGGINGS(7, 0), BOOTS(4, 0);
+
+        /** The armor pieces (made when the village has defenders). */
+        public static final java.util.List<Kind> ARMOR = java.util.List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS);
 
         private final int ingots;
         private final int sticks;
@@ -38,6 +44,9 @@ public final class SmithRules {
         public Optional<String> itemPath(String material) {
             if (this == SHEARS) {
                 return material.equals("iron") ? Optional.of("shears") : Optional.empty();
+            }
+            if (material.equals("diamond") && this == HOE) {
+                return Optional.empty(); // a diamond hoe is not worth the diamonds
             }
             return Optional.of(material + "_" + name().toLowerCase(Locale.ROOT));
         }
@@ -87,6 +96,11 @@ public final class SmithRules {
     /** Damage left after repairing with {@code ingots}. */
     public static int damageAfterRepair(int damage, int maxDamage, int ingots) {
         return Math.max(0, damage - ingots * Math.max(1, maxDamage / 4));
+    }
+
+    /** The item a material is made of: {@code diamond} → diamond, else {@code <material>_ingot} (M28a). */
+    public static String ingotPath(String material) {
+        return material.equals("diamond") ? "diamond" : material + "_ingot";
     }
 
     /** Ingot material of a tool by its item path ({@code iron_axe} → iron, {@code shears} → iron), or empty. */

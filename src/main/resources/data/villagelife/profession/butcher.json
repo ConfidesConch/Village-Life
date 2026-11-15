@@ -1,0 +1,80 @@
+{
+  "workstations": [
+    "minecraft:campfire",
+    "minecraft:soul_campfire"
+  ],
+  "schedule": "villagelife:default",
+  "work_radius": 48,
+  "tool": "minecraft:iron_axe",
+  "materials": [
+    "minecraft:leather"
+  ],
+  "products": [
+    "minecraft:beef",
+    "minecraft:porkchop",
+    "minecraft:chicken",
+    "minecraft:mutton",
+    "minecraft:leather",
+    "minecraft:leather_chestplate"
+  ],
+  "order": 55,
+  "secondary": true,
+  "crafts": [
+    {
+      "inputs": [
+        {
+          "item": "minecraft:leather",
+          "count": 8
+        }
+      ],
+      "output": {
+        "item": "minecraft:leather_chestplate",
+        "count": 1
+      },
+      "stock": 2,
+      "ticks": 80
+    },
+    {
+      "inputs": [
+        {
+          "item": "minecraft:leather",
+          "count": 7
+        }
+      ],
+      "output": {
+        "item": "minecraft:leather_leggings",
+        "count": 1
+      },
+      "stock": 2,
+      "ticks": 80
+    },
+    {
+      "inputs": [
+        {
+          "item": "minecraft:leather",
+          "count": 5
+        }
+      ],
+      "output": {
+        "item": "minecraft:leather_helmet",
+        "count": 1
+      },
+      "stock": 2,
+      "ticks": 80
+    },
+    {
+      "inputs": [
+        {
+          "item": "minecraft:leather",
+          "count": 4
+        }
+      ],
+      "output": {
+        "item": "minecraft:leather_boots",
+        "count": 1
+      },
+      "stock": 2,
+      "ticks": 80
+    }
+  ]
+}

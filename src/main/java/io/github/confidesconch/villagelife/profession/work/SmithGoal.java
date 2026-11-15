@@ -3,6 +3,7 @@ package io.github.confidesconch.villagelife.profession.work;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -36,7 +37,8 @@ import net.neoforged.neoforge.common.Tags;
 /**
  * Work of the smith (M13g, owner's choice "1a 2a 3a"): smelts raw iron and copper from storage in the
  * workshop's blast furnace ({@link OvenTender}, fuel from storage) and forges better tools for the
- * village's professions at the smithing table – iron, or copper if there is no iron – keeping
+ * village's professions at the smithing table – diamond if there are diamonds, else iron, else copper;
+ * M28a: also armor and swords for the defenders – keeping
  * {@link SmithRules#RESERVE} of each needed tool in storage, where the workers fetch them (M9b). Tools
  * and spare ingots go to the storage buildings, not to the workshop. Before forging he repairs worn
  * iron and copper tools that the workers brought back to storage ({@link ToolRepair}, M14d).
@@ -46,7 +48,8 @@ public class SmithGoal extends WorkGoal {
     /** Shown in the book as {@code villagelife.problem.work.smith.no_fuel}. */
     public static final String ISSUE_NO_FUEL = "smith.no_fuel";
 
-    private static final String[] MATERIALS = {"iron", "copper"};
+    /** Best first: diamond only when there are diamonds in storage (M28a). */
+    private static final String[] MATERIALS = {"diamond", "iron", "copper"};
     private static final int RAW_TO_FETCH = 16;
     private static final int FUEL_TO_FETCH = 8;
     private static final int INGOTS_TO_KEEP = 16;
@@ -105,7 +108,7 @@ public class SmithGoal extends WorkGoal {
         if (isRaw(stack)) {
             return RAW_TO_FETCH * 4;
         }
-        if (stack.is(Items.IRON_INGOT) || stack.is(Items.COPPER_INGOT)) {
+        if (stack.is(Items.IRON_INGOT) || stack.is(Items.COPPER_INGOT) || stack.is(Items.DIAMOND)) {
             return INGOTS_TO_KEEP;
         }
         return isWood(stack) || OvenTender.isFuel(stack) ? WOOD_TO_KEEP + FUEL_TO_FETCH : 0;
@@ -167,7 +170,7 @@ public class SmithGoal extends WorkGoal {
             }
             for (String material : MATERIALS) {
                 Item tool = kind.itemPath(material).map(this::item).orElse(Items.AIR);
-                Item ingot = material.equals("iron") ? Items.IRON_INGOT : Items.COPPER_INGOT;
+                Item ingot = item(SmithRules.ingotPath(material));
                 if (tool == Items.AIR) {
                     continue;
                 }
@@ -203,9 +206,12 @@ public class SmithGoal extends WorkGoal {
             return;
         }
         for (Workplace workplace : JobService.workplaces(level, village)) {
-            Professions.get(workplace.profession()).flatMap(Profession::tool)
-                    .flatMap(tool -> SmithRules.kindOf(tool.getPath()))
-                    .ifPresent(needed::add);
+            Optional<Profession> profession = Professions.get(workplace.profession());
+            profession.flatMap(Profession::tool).flatMap(tool -> SmithRules.kindOf(tool.getPath())).ifPresent(needed::add);
+            if (profession.map(Profession::defender).orElse(false)) {
+                needed.addAll(Kind.ARMOR); // M28a: guards, archers and the captain need armor
+                needed.add(Kind.SWORD);
+            }
         }
         for (Building building : village.buildings()) {
             if (building.type() != BuildingType.STORAGE || !building.isValid()) {

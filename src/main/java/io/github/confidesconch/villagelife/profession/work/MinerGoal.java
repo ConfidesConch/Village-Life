@@ -1,7 +1,6 @@
 package io.github.confidesconch.villagelife.profession.work;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,25 +8,21 @@ import java.util.Set;
 import io.github.confidesconch.villagelife.building.Building;
 import io.github.confidesconch.villagelife.building.BuildingType;
 import io.github.confidesconch.villagelife.core.registry.ModBlocks;
-import io.github.confidesconch.villagelife.inventory.StorageAccess;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.village.Village;
-import io.github.confidesconch.villagelife.village.VillageZone;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
- * Work of the miner (M13e, owner's choice "1a 2a 3a"): digs an open pit in its work area, layer by
- * layer from the top, down to the village's mine depth below the workplace, keeping a staircase along
+ * Work of the miner (M13e, owner's choice "1a 2a 3a"): digs an open pit in the nearest marked quarry (M28b:
+ * fence + sign, no map zones), layer by layer from the top, down to the village's mine depth below its ground, keeping a staircase along
  * the edge ({@link QuarryPlan}). Ores, coal and other finds always go to storage; cobblestone only until
  * the storage holds {@link #STONE_RESERVE}; dirt, gravel, sand and the other stones are dropped.
  * Never digs next to water or lava (that block stays as a wall). Unlike the other workers his basic
@@ -38,6 +33,8 @@ public class MinerGoal extends WorkGoal {
     public static final String PROFESSION = "villagelife:miner";
     /** Shown in the book as {@code villagelife.problem.work.miner.finished}. */
     public static final String ISSUE_FINISHED = "miner.finished";
+    /** M28d: the tunnel is finished or blocked (water, lava, no cobblestone to wall up a cave). */
+    public static final String ISSUE_TUNNEL_DONE = "miner.tunnel_done";
 
     static final int STONE_RESERVE = 256;
     private static final int BASE_TICKS_PER_HARDNESS = 15;
@@ -45,13 +42,9 @@ public class MinerGoal extends WorkGoal {
     /** Like a player: blocks up to 4.5 blocks from the eyes can be dug. */
     private static final double REACH = 4.5;
     /** Above the ground, blocks higher than this above the miner's feet wait until he stands higher. */
-    private static final int REACHABLE_ABOVE_FEET = 4;
     private static final int SEARCH_COOLDOWN_TICKS = 200;
-    /** How far above the workplace a hill in the area is still cleared. */
-    private static final int MAX_HEIGHT_ABOVE = 16;
-    private static final int STONE_COUNT_INTERVAL_TICKS = 600;
 
-    private enum Phase { TOOL, TO_BLOCK, MINE, DELIVER }
+    private enum Phase { TOOL, TORCH, TO_BLOCK, MINE, DELIVER }
 
     private final List<BlockPos> layer = new ArrayList<>();
     private final Set<BlockPos> skipped = new HashSet<>();
@@ -59,8 +52,13 @@ public class MinerGoal extends WorkGoal {
     private BlockPos target;
     private int phaseTicks;
     private long nextSearchGameTime;
-    private int stoneInStorage;
-    private long stoneCountedGameTime = -STONE_COUNT_INTERVAL_TICKS;
+    private final MinerStock stock = new MinerStock();
+    /** M28d: work in a tunnel instead of a quarry. */
+    private final TunnelDigger tunnel = new TunnelDigger();
+    private boolean inTunnel;
+    /** The target is an open tunnel cell to wall up, not a block to dig. */
+    private boolean sealing;
+    private int torchStep;
 
     public MinerGoal(ResidentEntity resident, double speedModifier) {
         // basic tool: a stone pickaxe that never wears out – with wood he could not harvest iron and copper ore
@@ -72,10 +70,12 @@ public class MinerGoal extends WorkGoal {
         if (!isWorkTime() || !(resident.level() instanceof ServerLevel level)) {
             return false;
         }
-        if (workArea() == null) {
+        Building site = site();
+        if (site == null) {
             resident.brain().setWorkIssue(ISSUE_NO_WORK_AREA);
             return startDeliver();
         }
+        inTunnel = site.type() == BuildingType.TUNNEL;
         if (ISSUE_NO_WORK_AREA.equals(resident.brain().workIssue())) {
             resident.brain().setWorkIssue(null);
         }
@@ -85,6 +85,13 @@ public class MinerGoal extends WorkGoal {
         if (mayFetchTool(level)) {
             setPhase(Phase.TOOL);
             return true;
+        }
+        if (inTunnel && TunnelDigger.needsTorches(resident)) {
+            TunnelDigger.craftTorches(resident);
+            if (TunnelDigger.needsTorches(resident) && mayFetch(level, "torch")) {
+                setPhase(Phase.TORCH);
+                return true;
+            }
         }
         return findBlock(level) || startDeliver();
     }
@@ -108,6 +115,8 @@ public class MinerGoal extends WorkGoal {
         target = null;
         layer.clear();
         skipped.clear(); // a new day: try blocks again (maybe with a better pickaxe)
+        tunnel.newDay(resident.level().getOverworldClockTime() / 24000L);
+        torchStep = 0;
         super.stop();
     }
 
@@ -125,6 +134,7 @@ public class MinerGoal extends WorkGoal {
                     continueWork(level);
                 }
             }
+            case TORCH -> fetchTorches(level);
             case DELIVER -> {
                 if (deliverStep(level)) {
                     continueWork(level);
@@ -152,10 +162,11 @@ public class MinerGoal extends WorkGoal {
     // ---- finding the next block ----------------------------------------------------------------
 
     private QuarryPlan plan() {
-        VillageZone zone = workArea();
+        Building quarry = site();
         Village village = resident.brain().village();
         int depth = village == null ? 16 : village.settings().mineDepth();
-        return new QuarryPlan(zone.minX(), zone.minZ(), zone.maxX(), zone.maxZ(), workplace().center().getY() - 1, depth);
+        return new QuarryPlan(quarry.min().getX(), quarry.min().getZ(), quarry.max().getX(), quarry.max().getZ(),
+                quarry.min().getY() - 1, depth);
     }
 
     /**
@@ -163,10 +174,15 @@ public class MinerGoal extends WorkGoal {
      * steep rock); below the ground strictly layer by layer, nearest first, so the stairs stay usable.
      */
     private boolean findBlock(ServerLevel level) {
-        if (workArea() == null) {
+        sealing = false;
+        Building site = site();
+        if (site == null) {
             return false;
         }
-        BlockPos high = nextAboveGround(level, plan());
+        if (site.type() == BuildingType.TUNNEL) {
+            return findInTunnel(level, site);
+        }
+        BlockPos high = QuarrySearch.nextAboveGround(level, plan(), resident, pos -> isMinable(level, pos));
         if (high != null) {
             target = high;
             setPhase(Phase.TO_BLOCK);
@@ -184,7 +200,7 @@ public class MinerGoal extends WorkGoal {
             return false;
         }
         nextSearchGameTime = level.getGameTime() + SEARCH_COOLDOWN_TICKS;
-        if (!scanTopLayer(level)) {
+        if (!QuarrySearch.scanTopLayer(level, plan(), resident.blockPosition(), pos -> isMinable(level, pos), layer)) {
             resident.brain().setWorkIssue(ISSUE_FINISHED);
             return false;
         }
@@ -195,74 +211,17 @@ public class MinerGoal extends WorkGoal {
         return findBlock(level);
     }
 
-    /**
-     * The block above the ground the miner should dig next: near him horizontally, higher ones first,
-     * but only up to {@link #REACHABLE_ABOVE_FEET} above his feet. Null if there is none in reach.
-     */
-    private BlockPos nextAboveGround(ServerLevel level, QuarryPlan plan) {
-        int top = Math.min(plan.groundY() + MAX_HEIGHT_ABOVE, highestBlock(level, plan));
-        int feet = resident.getBlockY();
-        BlockPos best = null;
-        double bestCost = Double.MAX_VALUE;
-        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int y = plan.groundY() + 1; y <= top; y++) {
-            if (y > feet + REACHABLE_ABOVE_FEET) {
-                break;
-            }
-            for (int x = plan.minX(); x <= plan.maxX(); x++) {
-                for (int z = plan.minZ(); z <= plan.maxZ(); z++) {
-                    double dx = x + 0.5 - resident.getX();
-                    double dz = z + 0.5 - resident.getZ();
-                    double cost = dx * dx + dz * dz - y * 0.5;
-                    if (cost < bestCost && isMinable(level, pos.set(x, y, z))) {
-                        best = pos.immutable();
-                        bestCost = cost;
-                    }
-                }
-            }
-        }
-        return best;
-    }
-
-    /** Fills {@link #layer} with the minable blocks of the highest layer below the ground that still has some. */
-    private boolean scanTopLayer(ServerLevel level) {
-        QuarryPlan plan = plan();
-        int top = plan.groundY();
-        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int y = top; y > plan.floorY(); y--) {
-            for (int x = plan.minX(); x <= plan.maxX(); x++) {
-                for (int z = plan.minZ(); z <= plan.maxZ(); z++) {
-                    pos.set(x, y, z);
-                    if (plan.shouldMine(x, y, z) && isMinable(level, pos)) {
-                        layer.add(pos.immutable());
-                    }
-                }
-            }
-            if (!layer.isEmpty()) {
-                BlockPos from = resident.blockPosition();
-                layer.sort(Comparator.comparingDouble(p -> p.distSqr(from)));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private int highestBlock(ServerLevel level, QuarryPlan plan) {
-        int top = plan.floorY();
-        for (int x = plan.minX(); x <= plan.maxX(); x++) {
-            for (int z = plan.minZ(); z <= plan.maxZ(); z++) {
-                if (level.hasChunkAt(x, z)) {
-                    top = Math.max(top, level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) - 1);
-                }
-            }
-        }
-        return top;
-    }
-
     /** M21d: marked fields and pastures (and their fences) are never dug up. */
     private List<Building> fieldsAndPastures() {
         Village village = resident.brain().village();
-        return village == null ? List.of() : village.buildings().stream().filter(b -> b.type().isArea()).toList();
+        return village == null ? List.of() : village.buildings().stream()
+                .filter(b -> b.type().isArea() && b.type() != BuildingType.QUARRY).toList();
+    }
+
+    /** M28b: the nearest valid marked quarry (M28d: or tunnel), or null. */
+    private Building site() {
+        Village village = resident.brain().village();
+        return village == null ? null : WorkAreas.of(village, workplace(), PROFESSION).orElse(null);
     }
 
     /** Solid, breakable, no block entity, not in a building, not next to water or lava, not skipped. */
@@ -286,10 +245,73 @@ public class MinerGoal extends WorkGoal {
         return true;
     }
 
+    // ---- tunnel (M28d) -------------------------------------------------------------------------
+
+    private boolean findInTunnel(ServerLevel level, Building site) {
+        if (level.getGameTime() < nextSearchGameTime || !level.isLoaded(site.markerPos())) {
+            return false;
+        }
+        Village village = resident.brain().village();
+        tunnel.use(level, site, village == null ? 16 : village.settings().mineDepth());
+        TunnelDigger.Target next = tunnel.next(level, pos -> isMinable(level, pos), !TunnelDigger.needsTorches(resident));
+        if (next == null) {
+            if (!tunnel.waitingForChunks()) { // review 15.11.2026: an unloaded tunnel part is no "finished"
+                resident.brain().setWorkIssue(ISSUE_TUNNEL_DONE);
+            }
+            nextSearchGameTime = level.getGameTime() + SEARCH_COOLDOWN_TICKS;
+            return false;
+        }
+        if (ISSUE_TUNNEL_DONE.equals(resident.brain().workIssue())) {
+            resident.brain().setWorkIssue(null);
+        }
+        target = next.pos();
+        sealing = next.seal();
+        setPhase(Phase.TO_BLOCK);
+        return true;
+    }
+
+    /**
+     * Torches from storage; if there are none, he makes them from coal (carried or from storage) and
+     * sticks from storage (fix 15.11.2026: before, only with coal already in his pack).
+     */
+    private void fetchTorches(ServerLevel level) {
+        FetchStatus status = switch (torchStep) {
+            case 0 -> fetchStep(level, "torch", stack -> stack.is(Items.TORCH), TunnelDigger.TORCHES_TO_KEEP);
+            case 1 -> resident.carriedCount(stack -> stack.is(ItemTags.COALS)) > 0 ? FetchStatus.DONE
+                    : fetchStep(level, "coal", stack -> stack.is(ItemTags.COALS), TunnelDigger.COAL_TO_KEEP);
+            default -> fetchStep(level, "stick", stack -> stack.is(Items.STICK), TunnelDigger.COAL_TO_KEEP);
+        };
+        if (status == FetchStatus.RUNNING) {
+            return;
+        }
+        boolean gotTorches = torchStep == 0 && !TunnelDigger.needsTorches(resident);
+        if (!gotTorches && torchStep < 2 && (torchStep == 0 || status == FetchStatus.DONE)) {
+            torchStep++; // no torches in storage: coal next, then sticks
+            return;
+        }
+        torchStep = 0;
+        TunnelDigger.craftTorches(resident);
+        continueWork(level);
+    }
+
+    @Override
+    protected int keepMaterial(ItemStack stack) {
+        if (!inTunnel) {
+            return super.keepMaterial(stack);
+        }
+        if (stack.is(Items.TORCH)) {
+            return TunnelDigger.TORCHES_TO_KEEP;
+        }
+        if (stack.is(Items.STICK) || stack.is(ItemTags.COALS)) {
+            return TunnelDigger.COAL_TO_KEEP;
+        }
+        return stack.is(ItemTags.STONE_CRAFTING_MATERIALS) ? TunnelDigger.COBBLE_TO_KEEP : super.keepMaterial(stack);
+    }
+
     // ---- digging ---------------------------------------------------------------------------
 
     private void walkToBlock(ServerLevel level) {
-        if (!isMinable(level, target)) {
+        if (!sealing && !isMinable(level, target)) {
             continueWork(level);
             return;
         }
@@ -297,10 +319,19 @@ public class MinerGoal extends WorkGoal {
         if (target.closerToCenterThan(resident.getEyePosition(), REACH)
                 || (pathEnded && target.closerToCenterThan(resident.getEyePosition(), REACH + 1.0))) {
             resident.getNavigation().stop();
+            if (sealing) {
+                swing();
+                tunnel.seal(level, target, resident); // M28d: wall up the cave, set the torch
+                continueWork(level);
+                return;
+            }
             setPhase(Phase.MINE);
             return;
         }
         if (phaseTicks > GIVE_UP_TICKS) {
+            if (sealing) {
+                tunnel.giveUp(target);
+            }
             skipped.add(target); // cannot get there today
             continueWork(level);
             return;
@@ -337,11 +368,16 @@ public class MinerGoal extends WorkGoal {
 
     /** Rule 2a: finds always, cobblestone up to the storage reserve, dirt/gravel/sand/other stone not. */
     private void keepOrDrop(ServerLevel level, ItemStack stack) {
-        if (isJunk(stack)) {
+        if (MinerStock.isJunk(stack)) {
+            return;
+        }
+        if (stack.is(ItemTags.STONE_CRAFTING_MATERIALS) && inTunnel
+                && resident.carriedCount(s -> s.is(ItemTags.STONE_CRAFTING_MATERIALS)) < TunnelDigger.COBBLE_TO_KEEP) {
+            resident.carry(stack); // M28d: kept for walling up caves
             return;
         }
         if (stack.is(ItemTags.STONE_CRAFTING_MATERIALS)) {
-            int wanted = QuarryPlan.stoneToKeep(stoneInStorage(level) + resident.carriedCount(s -> s.is(ItemTags.STONE_CRAFTING_MATERIALS)),
+            int wanted = QuarryPlan.stoneToKeep(stock.stoneInStorage(level, resident.brain().village()) + resident.carriedCount(s -> s.is(ItemTags.STONE_CRAFTING_MATERIALS)),
                     STONE_RESERVE);
             if (wanted <= 0) {
                 return;
@@ -351,33 +387,4 @@ public class MinerGoal extends WorkGoal {
         resident.carry(stack);
     }
 
-    private static boolean isJunk(ItemStack stack) {
-        return stack.is(ItemTags.DIRT) || stack.is(ItemTags.SAND) || stack.is(Items.GRAVEL)
-                || stack.is(Items.ANDESITE) || stack.is(Items.DIORITE) || stack.is(Items.GRANITE)
-                || stack.is(Items.TUFF) || stack.is(Items.CALCITE) || stack.is(Items.NETHERRACK);
-    }
-
-    /** Cobblestone (and the like) in the village's storage buildings, counted every 30 seconds. */
-    private int stoneInStorage(ServerLevel level) {
-        if (level.getGameTime() - stoneCountedGameTime < STONE_COUNT_INTERVAL_TICKS) {
-            return stoneInStorage;
-        }
-        stoneCountedGameTime = level.getGameTime();
-        int count = 0;
-        Village village = resident.brain().village();
-        for (Building building : village == null ? List.<Building>of() : village.buildings()) {
-            if (building.type() != BuildingType.STORAGE || !building.isValid()) {
-                continue;
-            }
-            for (BlockPos pos : building.containers()) {
-                Container container = StorageAccess.containerAt(level, pos);
-                for (int slot = 0; container != null && slot < container.getContainerSize(); slot++) {
-                    ItemStack stack = container.getItem(slot);
-                    count += stack.is(ItemTags.STONE_CRAFTING_MATERIALS) ? stack.getCount() : 0;
-                }
-            }
-        }
-        stoneInStorage = count;
-        return count;
-    }
 }

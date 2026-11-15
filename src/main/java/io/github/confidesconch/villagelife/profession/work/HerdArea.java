@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
+import io.github.confidesconch.villagelife.building.PastureKind;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.village.VillageZone;
 
@@ -23,7 +25,7 @@ import net.minecraft.world.phys.AABB;
  * to 8 blocks above the workplace's marker. Finds the animals inside (and marks them as belonging to
  * the workplace), escaped ones of the herd around it, and loose items.
  */
-record HerdArea(VillageZone zone, int markerY, String owner) {
+record HerdArea(VillageZone zone, int markerY, String owner, PastureKind kind) {
     /** How far above and below the workplace's marker animals still count as "in the area". */
     private static final int HEIGHT = 8;
     /** Escaped animals are looked for this far around the work area. */
@@ -57,7 +59,7 @@ record HerdArea(VillageZone zone, int markerY, String owner) {
     /** The animals in the area by kind; each one is marked as belonging to the workplace. */
     <T extends Animal> Map<EntityType<?>, Herd<T>> herds(ServerLevel level, Class<T> type, Predicate<T> filter) {
         Map<EntityType<?>, Herd<T>> herds = new LinkedHashMap<>();
-        for (T animal : level.getEntitiesOfClass(type, box(), a -> a.isAlive() && filter.test(a))) {
+        for (T animal : level.getEntitiesOfClass(type, box(), a -> a.isAlive() && filter.test(a) && kind.accepts(a))) {
             leashedByPlayer(animal); // drops a leftover resident leash
             animal.getPersistentData().putString(HERD_TAG, owner);
             Herd<T> herd = herds.computeIfAbsent(animal.getType(), kind -> new Herd<>());
@@ -90,6 +92,29 @@ record HerdArea(VillageZone zone, int markerY, String owner) {
             animal.removeLeash();
         }
         return animal.isLeashed();
+    }
+
+    /**
+     * M28b: an animal inside that does not belong here, or null: a pig in the cow pasture, or – in an open
+     * pasture – an animal whose kind has a pasture of its own ({@code ownPastures}).
+     */
+    Animal misplaced(ServerLevel level, Predicate<Animal> filter, Set<PastureKind> ownPastures) {
+        Predicate<Animal> wrongHere = kind == PastureKind.ALL
+                ? animal -> ownPastures.stream().anyMatch(own -> own.accepts(animal))
+                : animal -> !kind.accepts(animal);
+        List<Animal> wrong = level.getEntitiesOfClass(Animal.class, box(), animal -> animal.isAlive() && contains(animal)
+                && PastureKind.isHerdAnimal(animal) && wrongHere.test(animal) && !animal.isLeashed() && filter.test(animal));
+        return wrong.isEmpty() ? null : wrong.getFirst();
+    }
+
+    /** M28b: the animal now belongs to this area's herd (after moving it here). */
+    void adopt(Animal animal) {
+        animal.getPersistentData().putString(HERD_TAG, owner);
+    }
+
+    /** M28b: the animal belongs to no herd any more (set free outside), so nobody brings it back. */
+    static void release(Animal animal) {
+        animal.getPersistentData().remove(HERD_TAG);
     }
 
     /** An item lying in the area that matches, or null. */

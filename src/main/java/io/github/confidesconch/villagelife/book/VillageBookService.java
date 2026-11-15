@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import io.github.confidesconch.villagelife.VillageLife;
+import io.github.confidesconch.villagelife.building.BuildingType;
+import io.github.confidesconch.villagelife.building.PastureKind;
 import io.github.confidesconch.villagelife.core.registry.ModBlocks;
 import io.github.confidesconch.villagelife.core.util.ModProfiler;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
@@ -127,6 +129,13 @@ public final class VillageBookService {
                 .filter(l -> maySee(player, l.village()));
         if (located.isEmpty()) {
             return; // not registered or not ours to see: the marker reacts as before (scan and message)
+        }
+        if (located.get().building().type() == BuildingType.PASTURE && located.get().village().mayManage(player.getUUID())) {
+            PastureKind kind = PastureKind.cycle(level, event.getPos()); // M28b: which animals belong here
+            player.sendOverlayMessage(Component.translatable("villagelife.pasture.set", kind.displayName()));
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            return;
         }
         openBuilding(player, located.get().village(), located.get().building().id());
         event.setCanceled(true);

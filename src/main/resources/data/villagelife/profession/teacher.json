@@ -4,5 +4,6 @@
   ],
   "schedule": "villagelife:default",
   "work_radius": 24,
-  "order": 140
+  "order": 140,
+  "secondary": true
 }

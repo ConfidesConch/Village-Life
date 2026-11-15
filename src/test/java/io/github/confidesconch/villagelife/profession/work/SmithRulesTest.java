@@ -29,6 +29,21 @@ class SmithRulesTest {
         assertEquals(Optional.of("copper_pickaxe"), Kind.PICKAXE.itemPath("copper"));
         assertEquals(Optional.of("shears"), Kind.SHEARS.itemPath("iron"));
         assertTrue(Kind.SHEARS.itemPath("copper").isEmpty());
+        assertEquals(Optional.of("iron_chestplate"), Kind.CHESTPLATE.itemPath("iron"));
+        assertEquals(Optional.of("diamond_pickaxe"), Kind.PICKAXE.itemPath("diamond"));
+        assertTrue(Kind.HOE.itemPath("diamond").isEmpty());
+        assertEquals("diamond", SmithRules.ingotPath("diamond"));
+        assertEquals("iron_ingot", SmithRules.ingotPath("iron"));
+    }
+
+    @Test
+    void armorCostsLikeMinecraft() {
+        assertEquals(5, Kind.HELMET.ingots());
+        assertEquals(8, Kind.CHESTPLATE.ingots());
+        assertEquals(7, Kind.LEGGINGS.ingots());
+        assertEquals(4, Kind.BOOTS.ingots());
+        assertEquals(0, Kind.BOOTS.sticks());
+        assertEquals(4, Kind.ARMOR.size());
     }
 
     @Test

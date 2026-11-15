@@ -1,6 +1,7 @@
 package io.github.confidesconch.villagelife.command;
 
 import io.github.confidesconch.villagelife.VillageLife;
+import io.github.confidesconch.villagelife.playtime.PlaytimeCommands;
 
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -24,6 +25,7 @@ public final class VillageLifeCommands {
                         }))
                 .then(VillageCommands.build())
                 .then(DebugCommands.build()));
+        event.getDispatcher().register(PlaytimeCommands.build()); // M29: /playtime, /playtime top
     }
 
     private static String modVersion(String modId) {

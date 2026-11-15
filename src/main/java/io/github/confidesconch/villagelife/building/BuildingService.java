@@ -110,6 +110,7 @@ public final class BuildingService {
         }
         Optional<Building> previous = manager.findBuilding(markerPos).map(VillageManager.Located::building);
         Building building = type.isArea() ? AreaService.build(level, markerPos, type, previous) // M21d
+                : type == BuildingType.TUNNEL ? AreaService.tunnel(level, markerPos, previous) // M28d
                 : toBuilding(level, markerPos, type, evaluate(level, markerPos, type), previous);
         manager.removeBuildingAt(markerPos); // in case the marker belonged to another village before
         manager.putBuilding(village.get(), building);
@@ -117,7 +118,9 @@ public final class BuildingService {
         BuildingRescanner.forget(level, markerPos);
         showValidity(level, markerPos, building.isValid());
 
-        if (building.isValid() && type.isArea()) {
+        if (building.isValid() && type == BuildingType.TUNNEL) {
+            tell(player, Component.translatable("villagelife.building.tunnel_valid", village.get().displayName()), true);
+        } else if (building.isValid() && type.isArea()) {
             tell(player, Component.translatable("villagelife.building.area_valid", typeName, village.get().displayName(),
                     building.interiorVolume()), true);
         } else if (building.isValid()) {
@@ -145,7 +148,10 @@ public final class BuildingService {
         BuildingType type = state.getValue(BuildingMarkerBlock.TYPE);
         Building updated;
         boolean unloaded;
-        if (type.isArea()) { // M21d: field or pasture
+        if (type == BuildingType.TUNNEL) { // M28d
+            updated = AreaService.tunnel(level, markerPos, Optional.of(old));
+            unloaded = false;
+        } else if (type.isArea()) { // M21d: field or pasture
             updated = AreaService.build(level, markerPos, type, Optional.of(old));
             unloaded = updated.problem().filter(p -> AreaService.UNLOADED.equals(p.reasonKey())).isPresent();
         } else {
@@ -213,6 +219,9 @@ public final class BuildingService {
             return;
         }
         MarkerSymbol symbol = symbolOf(level, markerPos, state.getValue(BuildingMarkerBlock.TYPE));
+        if (symbol == MarkerSymbol.PASTURE) { // M28b: the animal chosen at the sign stays
+            symbol = PastureKind.ofSymbol(state.getValue(BuildingMarkerBlock.SYMBOL)).symbol();
+        }
         if (state.getValue(BuildingMarkerBlock.VALID) != valid || state.getValue(BuildingMarkerBlock.SYMBOL) != symbol) {
             level.setBlock(markerPos, state.setValue(BuildingMarkerBlock.VALID, valid)
                     .setValue(BuildingMarkerBlock.SYMBOL, symbol), Block.UPDATE_CLIENTS);
@@ -225,6 +234,8 @@ public final class BuildingService {
             case STORAGE -> MarkerSymbol.STORAGE;
             case FIELD -> MarkerSymbol.FIELD;
             case PASTURE -> MarkerSymbol.PASTURE;
+            case QUARRY -> MarkerSymbol.QUARRY;
+            case TUNNEL -> MarkerSymbol.TUNNEL;
             case WORKPLACE -> VillageManager.get(level).findBuilding(markerPos)
                     .map(located -> located.building().workstations().stream()
                             .filter(level::isLoaded).map(pos -> level.getBlockState(pos).getBlock()).toList())
@@ -235,7 +246,7 @@ public final class BuildingService {
 
     /** The air cells of a registered room as they are now (M21e: places in the tavern); empty if it is not closed. */
     public static List<BlockPos> interior(ServerLevel level, Building building) {
-        if (building.type().isArea() || !level.isLoaded(building.markerPos())) {
+        if (building.type().isArea() || building.type() == BuildingType.TUNNEL || !level.isLoaded(building.markerPos())) {
             return List.of();
         }
         RoomScanner.Result result = scanRoom(level, building.markerPos(), SyncedConfig.MAX_BUILDING_VOLUME.getAsInt());

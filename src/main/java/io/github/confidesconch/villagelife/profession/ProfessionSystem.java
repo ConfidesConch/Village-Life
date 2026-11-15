@@ -2,9 +2,11 @@ package io.github.confidesconch.villagelife.profession;
 
 import io.github.confidesconch.villagelife.core.util.ModProfiler;
 import io.github.confidesconch.villagelife.profession.work.BreederGoal;
+import io.github.confidesconch.villagelife.profession.work.ButcherGoal;
 import io.github.confidesconch.villagelife.profession.work.CookGoal;
 import io.github.confidesconch.villagelife.profession.work.CraftGoal;
 import io.github.confidesconch.villagelife.profession.work.DruidGoal;
+import io.github.confidesconch.villagelife.profession.work.EnchanterGoal;
 import io.github.confidesconch.villagelife.profession.work.FarmerGoal;
 import io.github.confidesconch.villagelife.profession.work.FishermanGoal;
 import io.github.confidesconch.villagelife.profession.work.LumberjackGoal;
@@ -68,6 +70,10 @@ public final class ProfessionSystem {
         ResidentHooks.setWorkBonus(HealerGoal::workBonus); // M24: morning blessing
         ResidentHooks.addGoalProvider(resident ->
                 resident.goalSelector.addGoal(WORK_PRIORITY, new DruidGoal(resident, 0.6))); // M25
+        ResidentHooks.addGoalProvider(resident ->
+                resident.goalSelector.addGoal(WORK_PRIORITY, new EnchanterGoal(resident, 0.6))); // M26
+        ResidentHooks.addGoalProvider(resident ->
+                resident.goalSelector.addGoal(WORK_PRIORITY, new ButcherGoal(resident, 0.6))); // M27
         // every profession whose file has "crafts" (baker, carpenter …) shares one goal (M14a)
         ResidentHooks.addGoalProvider(resident ->
                 resident.goalSelector.addGoal(WORK_PRIORITY, new CraftGoal(resident, 0.6)));

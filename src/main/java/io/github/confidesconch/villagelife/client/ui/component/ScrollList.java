@@ -22,6 +22,13 @@ public final class ScrollList {
     private int lastMax;
     private int rowHeight = 1;
     private boolean dragging;
+    /** A row to bring into view at the next render (−1: none). */
+    private int scrollToRow = -1;
+
+    /** Shows row {@code index} in the middle of the list at the next render (15.11.2026: a right-clicked resident). */
+    public void scrollTo(int index) {
+        scrollToRow = index;
+    }
 
     /** Back to the top (e.g. after a new search). */
     public void reset() {
@@ -32,6 +39,10 @@ public final class ScrollList {
         this.rowHeight = Math.max(1, rowHeight);
         lastArea = area;
         lastMax = Math.max(0, count * rowHeight - area.h());
+        if (scrollToRow >= 0) {
+            offset = scrollToRow * rowHeight - (area.h() - rowHeight) / 2;
+            scrollToRow = -1;
+        }
         offset = Math.max(0, Math.min(offset, lastMax));
         boolean bar = lastMax > 0;
         UiRect rows = bar ? area.inset(0, 0, BAR + 2, 0) : area;

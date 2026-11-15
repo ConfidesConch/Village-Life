@@ -30,6 +30,11 @@ public final class ToolTiers {
         return 1.25;
     }
 
+    /** M26: each level of efficiency makes the tool 15 % faster (III: ×1.45). */
+    public static double withEfficiency(double speed, int efficiencyLevel) {
+        return speed * (1.0 + 0.15 * Math.max(0, efficiencyLevel));
+    }
+
     /** Ticks a work step takes with a tool of this speed (never less than 1). */
     public static int ticks(int basicTicks, double speed) {
         return Math.max(1, (int) Math.round(basicTicks / speed));

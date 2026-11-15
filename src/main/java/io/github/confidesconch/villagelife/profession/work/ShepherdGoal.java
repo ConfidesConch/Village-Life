@@ -3,6 +3,7 @@ package io.github.confidesconch.villagelife.profession.work;
 import java.util.List;
 
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
+import io.github.confidesconch.villagelife.village.Village;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -13,14 +14,24 @@ import net.neoforged.neoforge.common.Tags;
 
 /**
  * Work of the shepherd (M13c): shears the sheep in its work area, breeds them with wheat from storage
- * up to the village's herd limit and slaughters sheep above it (sheared ones first). Wool and mutton
- * go to the hut or storage. Basic tool: shears that never wear out.
+ * up to the village's herd limit (slaughtering: the butcher, M27). Wool goes to the hut or storage.
+ * M28b (owner's choice "B"): while the village has a breeder, the breeder looks after the sheep and the
+ * shepherd only shears.
+ * Basic tool: shears that never wear out.
  */
 public class ShepherdGoal extends HerdGoal<Sheep> {
     public static final String PROFESSION = "villagelife:shepherd";
 
     public ShepherdGoal(ResidentEntity resident, double speedModifier) {
         super(resident, speedModifier, PROFESSION, Tags.Items.TOOLS_SHEAR, Items.SHEARS, Sheep.class);
+    }
+
+    /** Only while no resident works as breeder (M28b). */
+    @Override
+    protected boolean caresForHerd() {
+        Village village = resident.brain().village();
+        return village == null || village.residents().stream()
+                .noneMatch(r -> r.job().filter(job -> BreederGoal.PROFESSION.equals(job.profession())).isPresent());
     }
 
     @Override
@@ -38,10 +49,5 @@ public class ShepherdGoal extends HerdGoal<Sheep> {
         if (sheep.readyForShearing()) {
             sheep.shear(level, SoundSource.NEUTRAL, resident.getMainHandItem().copy());
         }
-    }
-
-    @Override
-    protected Sheep cullCandidate(List<Sheep> adults) {
-        return adults.stream().filter(Sheep::isSheared).findFirst().orElse(adults.getFirst());
     }
 }

@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import io.github.confidesconch.villagelife.building.Building;
+import io.github.confidesconch.villagelife.building.BuildingType;
 import io.github.confidesconch.villagelife.inventory.StorageAccess;
 import io.github.confidesconch.villagelife.profession.Profession;
 import io.github.confidesconch.villagelife.resident.Job;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.resident.schedule.Activity;
 import io.github.confidesconch.villagelife.village.Village;
-import io.github.confidesconch.villagelife.village.VillageZone;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,6 +28,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.component.SwingAnimation;
 
 /**
@@ -110,17 +111,11 @@ abstract class WorkGoal extends Goal {
     /** Shown in the book as {@code villagelife.problem.work.no_work_area} (M13c). */
     protected static final String ISSUE_NO_WORK_AREA = Profession.ISSUE_NO_WORK_AREA;
 
-    /** The zone the owner assigned to the workplace as work area (M13c), or null. */
-    protected VillageZone workArea() {
-        Village village = resident.brain().village();
-        Building workplace = workplace();
-        return village == null || workplace == null ? null : village.workAreaOf(workplace.id()).orElse(null);
-    }
-
     /** Registered rooms of the village (their insides are off limits for field work); M21d: no fields/pastures. */
     protected List<Building> villageBuildings() {
         return resident.brain().village() == null ? List.of()
-                : resident.brain().village().buildings().stream().filter(b -> !b.type().isArea()).toList();
+                : resident.brain().village().buildings().stream()
+                        .filter(b -> !b.type().isArea() && b.type() != BuildingType.TUNNEL).toList(); // M28d: a sign, not a room
     }
 
     protected void resetPath() {
@@ -140,18 +135,18 @@ abstract class WorkGoal extends Goal {
 
     // ---- what the worker keeps -------------------------------------------------------------
 
-    /** How many of this item the worker keeps instead of delivering: its best tool plus {@link #keepMaterial}. */
-    private int keepAmount(ItemStack stack, Item bestTool) {
-        return (bestTool != null && stack.is(bestTool) ? 1 : 0) + keepMaterial(stack);
-    }
-
-    /** The item type of the fastest fitting tool among the items, or null. */
-    private Item bestToolIn(List<ItemStack> items) {
-        Item best = null;
+    /**
+     * Index of the fastest fitting tool among the items, or -1. Fix 15.11.2026: the exact stack, not its
+     * item type – with an enchanted and a plain pickaxe of the same kind the plain one was kept, the
+     * enchanted one delivered and fetched again, over and over.
+     */
+    private int bestToolIndex(List<ItemStack> items) {
+        int best = -1;
         double bestSpeed = 0;
-        for (ItemStack stack : items) {
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack stack = items.get(i);
             if (stack.is(toolTag) && speedOf(stack) > bestSpeed) {
-                best = stack.getItem();
+                best = i;
                 bestSpeed = speedOf(stack);
             }
         }
@@ -181,7 +176,8 @@ abstract class WorkGoal extends Goal {
 
     private static double speedOf(ItemStack stack) { // worn tools count as useless: they go back to storage (M14d)
         return ToolTiers.isWorn(stack.getDamageValue(), stack.getMaxDamage()) ? 0
-                : ToolTiers.speed(BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath());
+                : ToolTiers.withEfficiency(ToolTiers.speed(BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()),
+                        ToolEnchants.level(stack, Enchantments.EFFICIENCY)); // M26: enchanted tools work faster
     }
 
     /** Speed factor of the tool the worker uses right now (1.0 = wooden basic tool). */
@@ -233,14 +229,17 @@ abstract class WorkGoal extends Goal {
     private record Split(List<ItemStack> keep, List<ItemStack> deliver) {}
 
     private Split split(List<ItemStack> items) {
-        Item bestTool = bestToolIn(items);
+        int bestTool = bestToolIndex(items);
         Map<Item, Integer> kept = new HashMap<>();
         List<ItemStack> keep = new ArrayList<>();
         List<ItemStack> deliver = new ArrayList<>();
-        for (ItemStack stack : items) {
-            ItemStack rest = stack.copy();
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack rest = items.get(i).copy();
+            if (i == bestTool) { // the tool in use stays, whatever else of the same kind is carried
+                keep.add(rest.split(1));
+            }
             int already = kept.getOrDefault(rest.getItem(), 0);
-            int amount = Math.min(rest.getCount(), Math.max(0, keepAmount(rest, bestTool) - already));
+            int amount = Math.min(rest.getCount(), Math.max(0, keepMaterial(rest) - already));
             kept.put(rest.getItem(), already + amount);
             if (amount > 0) {
                 keep.add(rest.split(amount));

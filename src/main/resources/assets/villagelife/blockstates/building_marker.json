@@ -582,6 +582,12 @@
     "facing=north,symbol=druid,valid=false": {
       "model": "villagelife:block/marker_druid"
     },
+    "facing=north,symbol=enchanter,valid=false": {
+      "model": "villagelife:block/marker_enchanter"
+    },
+    "facing=north,symbol=butcher,valid=false": {
+      "model": "villagelife:block/marker_butcher"
+    },
     "facing=east,symbol=captain,valid=false": {
       "model": "villagelife:block/marker_captain",
       "y": 90
@@ -596,6 +602,14 @@
     },
     "facing=east,symbol=druid,valid=false": {
       "model": "villagelife:block/marker_druid",
+      "y": 90
+    },
+    "facing=east,symbol=enchanter,valid=false": {
+      "model": "villagelife:block/marker_enchanter",
+      "y": 90
+    },
+    "facing=east,symbol=butcher,valid=false": {
+      "model": "villagelife:block/marker_butcher",
       "y": 90
     },
     "facing=south,symbol=captain,valid=false": {
@@ -614,6 +628,14 @@
       "model": "villagelife:block/marker_druid",
       "y": 180
     },
+    "facing=south,symbol=enchanter,valid=false": {
+      "model": "villagelife:block/marker_enchanter",
+      "y": 180
+    },
+    "facing=south,symbol=butcher,valid=false": {
+      "model": "villagelife:block/marker_butcher",
+      "y": 180
+    },
     "facing=west,symbol=captain,valid=false": {
       "model": "villagelife:block/marker_captain",
       "y": 270
@@ -630,6 +652,14 @@
       "model": "villagelife:block/marker_druid",
       "y": 270
     },
+    "facing=west,symbol=enchanter,valid=false": {
+      "model": "villagelife:block/marker_enchanter",
+      "y": 270
+    },
+    "facing=west,symbol=butcher,valid=false": {
+      "model": "villagelife:block/marker_butcher",
+      "y": 270
+    },
     "facing=north,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid"
     },
@@ -641,6 +671,12 @@
     },
     "facing=north,symbol=druid,valid=true": {
       "model": "villagelife:block/marker_druid_valid"
+    },
+    "facing=north,symbol=enchanter,valid=true": {
+      "model": "villagelife:block/marker_enchanter_valid"
+    },
+    "facing=north,symbol=butcher,valid=true": {
+      "model": "villagelife:block/marker_butcher_valid"
     },
     "facing=east,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid",
@@ -656,6 +692,14 @@
     },
     "facing=east,symbol=druid,valid=true": {
       "model": "villagelife:block/marker_druid_valid",
+      "y": 90
+    },
+    "facing=east,symbol=enchanter,valid=true": {
+      "model": "villagelife:block/marker_enchanter_valid",
+      "y": 90
+    },
+    "facing=east,symbol=butcher,valid=true": {
+      "model": "villagelife:block/marker_butcher_valid",
       "y": 90
     },
     "facing=south,symbol=captain,valid=true": {
@@ -674,6 +718,14 @@
       "model": "villagelife:block/marker_druid_valid",
       "y": 180
     },
+    "facing=south,symbol=enchanter,valid=true": {
+      "model": "villagelife:block/marker_enchanter_valid",
+      "y": 180
+    },
+    "facing=south,symbol=butcher,valid=true": {
+      "model": "villagelife:block/marker_butcher_valid",
+      "y": 180
+    },
     "facing=west,symbol=captain,valid=true": {
       "model": "villagelife:block/marker_captain_valid",
       "y": 270
@@ -688,6 +740,14 @@
     },
     "facing=west,symbol=druid,valid=true": {
       "model": "villagelife:block/marker_druid_valid",
+      "y": 270
+    },
+    "facing=west,symbol=enchanter,valid=true": {
+      "model": "villagelife:block/marker_enchanter_valid",
+      "y": 270
+    },
+    "facing=west,symbol=butcher,valid=true": {
+      "model": "villagelife:block/marker_butcher_valid",
       "y": 270
     },
     "facing=north,symbol=field,valid=false": {
@@ -723,31 +783,211 @@
     "facing=north,symbol=pasture,valid=false": {
       "model": "villagelife:block/marker_pasture"
     },
+    "facing=north,symbol=quarry,valid=false": {
+      "model": "villagelife:block/marker_quarry"
+    },
+    "facing=north,symbol=tunnel,valid=false": {
+      "model": "villagelife:block/marker_tunnel"
+    },
+    "facing=north,symbol=pasture_cow,valid=false": {
+      "model": "villagelife:block/marker_pasture_cow"
+    },
+    "facing=north,symbol=pasture_pig,valid=false": {
+      "model": "villagelife:block/marker_pasture_pig"
+    },
+    "facing=north,symbol=pasture_chicken,valid=false": {
+      "model": "villagelife:block/marker_pasture_chicken"
+    },
+    "facing=north,symbol=pasture_sheep,valid=false": {
+      "model": "villagelife:block/marker_pasture_sheep"
+    },
     "facing=east,symbol=pasture,valid=false": {
       "model": "villagelife:block/marker_pasture",
+      "y": 90
+    },
+    "facing=east,symbol=quarry,valid=false": {
+      "model": "villagelife:block/marker_quarry",
+      "y": 90
+    },
+    "facing=east,symbol=tunnel,valid=false": {
+      "model": "villagelife:block/marker_tunnel",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_cow,valid=false": {
+      "model": "villagelife:block/marker_pasture_cow",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_pig,valid=false": {
+      "model": "villagelife:block/marker_pasture_pig",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_chicken,valid=false": {
+      "model": "villagelife:block/marker_pasture_chicken",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_sheep,valid=false": {
+      "model": "villagelife:block/marker_pasture_sheep",
       "y": 90
     },
     "facing=south,symbol=pasture,valid=false": {
       "model": "villagelife:block/marker_pasture",
       "y": 180
     },
+    "facing=south,symbol=quarry,valid=false": {
+      "model": "villagelife:block/marker_quarry",
+      "y": 180
+    },
+    "facing=south,symbol=tunnel,valid=false": {
+      "model": "villagelife:block/marker_tunnel",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_cow,valid=false": {
+      "model": "villagelife:block/marker_pasture_cow",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_pig,valid=false": {
+      "model": "villagelife:block/marker_pasture_pig",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_chicken,valid=false": {
+      "model": "villagelife:block/marker_pasture_chicken",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_sheep,valid=false": {
+      "model": "villagelife:block/marker_pasture_sheep",
+      "y": 180
+    },
     "facing=west,symbol=pasture,valid=false": {
       "model": "villagelife:block/marker_pasture",
+      "y": 270
+    },
+    "facing=west,symbol=quarry,valid=false": {
+      "model": "villagelife:block/marker_quarry",
+      "y": 270
+    },
+    "facing=west,symbol=tunnel,valid=false": {
+      "model": "villagelife:block/marker_tunnel",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_cow,valid=false": {
+      "model": "villagelife:block/marker_pasture_cow",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_pig,valid=false": {
+      "model": "villagelife:block/marker_pasture_pig",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_chicken,valid=false": {
+      "model": "villagelife:block/marker_pasture_chicken",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_sheep,valid=false": {
+      "model": "villagelife:block/marker_pasture_sheep",
       "y": 270
     },
     "facing=north,symbol=pasture,valid=true": {
       "model": "villagelife:block/marker_pasture_valid"
     },
+    "facing=north,symbol=quarry,valid=true": {
+      "model": "villagelife:block/marker_quarry_valid"
+    },
+    "facing=north,symbol=tunnel,valid=true": {
+      "model": "villagelife:block/marker_tunnel_valid"
+    },
+    "facing=north,symbol=pasture_cow,valid=true": {
+      "model": "villagelife:block/marker_pasture_cow_valid"
+    },
+    "facing=north,symbol=pasture_pig,valid=true": {
+      "model": "villagelife:block/marker_pasture_pig_valid"
+    },
+    "facing=north,symbol=pasture_chicken,valid=true": {
+      "model": "villagelife:block/marker_pasture_chicken_valid"
+    },
+    "facing=north,symbol=pasture_sheep,valid=true": {
+      "model": "villagelife:block/marker_pasture_sheep_valid"
+    },
     "facing=east,symbol=pasture,valid=true": {
       "model": "villagelife:block/marker_pasture_valid",
+      "y": 90
+    },
+    "facing=east,symbol=quarry,valid=true": {
+      "model": "villagelife:block/marker_quarry_valid",
+      "y": 90
+    },
+    "facing=east,symbol=tunnel,valid=true": {
+      "model": "villagelife:block/marker_tunnel_valid",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_cow,valid=true": {
+      "model": "villagelife:block/marker_pasture_cow_valid",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_pig,valid=true": {
+      "model": "villagelife:block/marker_pasture_pig_valid",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_chicken,valid=true": {
+      "model": "villagelife:block/marker_pasture_chicken_valid",
+      "y": 90
+    },
+    "facing=east,symbol=pasture_sheep,valid=true": {
+      "model": "villagelife:block/marker_pasture_sheep_valid",
       "y": 90
     },
     "facing=south,symbol=pasture,valid=true": {
       "model": "villagelife:block/marker_pasture_valid",
       "y": 180
     },
+    "facing=south,symbol=quarry,valid=true": {
+      "model": "villagelife:block/marker_quarry_valid",
+      "y": 180
+    },
+    "facing=south,symbol=tunnel,valid=true": {
+      "model": "villagelife:block/marker_tunnel_valid",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_cow,valid=true": {
+      "model": "villagelife:block/marker_pasture_cow_valid",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_pig,valid=true": {
+      "model": "villagelife:block/marker_pasture_pig_valid",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_chicken,valid=true": {
+      "model": "villagelife:block/marker_pasture_chicken_valid",
+      "y": 180
+    },
+    "facing=south,symbol=pasture_sheep,valid=true": {
+      "model": "villagelife:block/marker_pasture_sheep_valid",
+      "y": 180
+    },
     "facing=west,symbol=pasture,valid=true": {
       "model": "villagelife:block/marker_pasture_valid",
+      "y": 270
+    },
+    "facing=west,symbol=quarry,valid=true": {
+      "model": "villagelife:block/marker_quarry_valid",
+      "y": 270
+    },
+    "facing=west,symbol=tunnel,valid=true": {
+      "model": "villagelife:block/marker_tunnel_valid",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_cow,valid=true": {
+      "model": "villagelife:block/marker_pasture_cow_valid",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_pig,valid=true": {
+      "model": "villagelife:block/marker_pasture_pig_valid",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_chicken,valid=true": {
+      "model": "villagelife:block/marker_pasture_chicken_valid",
+      "y": 270
+    },
+    "facing=west,symbol=pasture_sheep,valid=true": {
+      "model": "villagelife:block/marker_pasture_sheep_valid",
       "y": 270
     }
   }
