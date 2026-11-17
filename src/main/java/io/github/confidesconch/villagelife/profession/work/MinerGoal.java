@@ -325,8 +325,10 @@ public class MinerGoal extends WorkGoal {
             return;
         }
         boolean pathEnded = resident.getNavigation().isDone() && phaseTicks > REPATH_TICKS;
-        if (target.closerToCenterThan(resident.getEyePosition(), REACH)
-                || (pathEnded && target.closerToCenterThan(resident.getEyePosition(), REACH + 1.0))) {
+        // fix 17.11.2026: in a tunnel he works only from inside, not down through the rock from above (a pit rim)
+        boolean fromInside = !inTunnel || resident.getBlockY() - target.getY() <= 2;
+        if (fromInside && (target.closerToCenterThan(resident.getEyePosition(), REACH)
+                || (pathEnded && target.closerToCenterThan(resident.getEyePosition(), REACH + 1.0)))) {
             resident.getNavigation().stop();
             if (sealing) {
                 swing();

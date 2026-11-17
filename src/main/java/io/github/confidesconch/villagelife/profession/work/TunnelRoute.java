@@ -30,7 +30,11 @@ final class TunnelRoute {
     /** Column (x, z) → {segment, index in its list}. */
     private final Map<Long, int[]> columns = new HashMap<>();
 
-    TunnelRoute(TunnelPlan plan) {
+    /** Where one stands in front of the entrance: the sign's own column, at the tunnel floor. */
+    private final BlockPos approach;
+
+    TunnelRoute(TunnelPlan plan, BlockPos approach) {
+        this.approach = approach;
         for (Cell cell : plan.cells()) {
             if (!cell.floor()) {
                 continue;
@@ -53,7 +57,11 @@ final class TunnelRoute {
     /** Where the miner standing at {@code feet} should walk next on his way to {@code target}. */
     BlockPos waypoint(BlockPos feet, BlockPos target) {
         int[] at = columns.get(key(target));
-        if (at == null || trunk.isEmpty() || feet.distSqr(target) <= DIRECT_SQR) {
+        if (at == null || trunk.isEmpty()) {
+            return target;
+        }
+        // straight to a close target – but not from above (e.g. the rim of a pit): then the way goes round
+        if (feet.distSqr(target) <= DIRECT_SQR && Math.abs(feet.getY() - target.getY()) <= 2) {
             return target;
         }
         List<BlockPos> route = route(at);
@@ -74,7 +82,11 @@ final class TunnelRoute {
             int back = standing[1] - LOOK_AHEAD;
             return back >= 0 ? branch.get(back) : trunk.get(junctions.getOrDefault(standing[0], 0));
         }
-        return route.getFirst(); // not in the tunnel yet: first to the entrance, the rest follows from there
+        // not in the tunnel yet: first to the spot in front of the entrance (fix 17.11.2026: also at the
+        // bottom of a pit with steps down), then in; the rest follows from there
+        boolean atEntrance = Math.abs(approach.getX() - feet.getX()) <= 1 && Math.abs(approach.getZ() - feet.getZ()) <= 1
+                && Math.abs(approach.getY() - feet.getY()) <= 1;
+        return atEntrance ? route.getFirst() : approach;
     }
 
     /** The walking cells from the entrance to the column {@code at}. */

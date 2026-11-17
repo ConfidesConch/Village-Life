@@ -84,7 +84,7 @@ final class TunnelDigger {
         Set<Long> keys = new HashSet<>();
         plan.cells().forEach(cell -> keys.add(BlockPos.asLong(cell.x(), cell.y(), cell.z())));
         inPlan = keys;
-        route = new TunnelRoute(plan);
+        route = new TunnelRoute(plan, new BlockPos(entrance.getX(), floorY, entrance.getZ()));
         sealed.clear();
         waiting.clear();
         missingTorches.clear();
