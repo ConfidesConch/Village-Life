@@ -21,7 +21,7 @@ public final class LevelAreaView implements AreaScanner.View {
 
     @Override
     public boolean isLoaded(int x, int z) {
-        return level.hasChunkAt(x, z);
+        return LevelScanView.isReallyLoaded(level, x, z); // hotfix 1.5.1, see there
     }
 
     @Override

@@ -23,7 +23,16 @@ public final class LevelScanView implements RoomScanner.View {
 
     @Override
     public boolean isLoaded(int x, int y, int z) {
-        return level.isLoaded(cursor.set(x, y, z));
+        return isReallyLoaded(level, x, z);
+    }
+
+    /**
+     * True only if the chunk is fully there right now (hotfix 1.5.1). {@code Level#isLoaded} already says
+     * yes while a chunk is still on its way in – then its height map, and with it the "roof", was not
+     * reliable, and houses were reported roofless after the player came back from far away.
+     */
+    public static boolean isReallyLoaded(ServerLevel level, int x, int z) {
+        return level.getChunkSource().getChunkNow(x >> 4, z >> 4) != null;
     }
 
     @Override

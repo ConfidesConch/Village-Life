@@ -21,6 +21,7 @@ import io.github.confidesconch.villagelife.village.VillageService;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -133,6 +134,13 @@ public final class BuildingService {
     }
 
     /** Automatic rescan (after changes or periodically). Tells the owner only when validity changes. */
+    /** Buildings that looked broken once and wait for the confirming second check (hotfix 1.5.1). */
+    private static final Set<GlobalPos> SUSPECT = new java.util.HashSet<>();
+
+    static void clearSuspects() {
+        SUSPECT.clear();
+    }
+
     public static void rescan(ServerLevel level, BlockPos markerPos) {
         VillageManager manager = VillageManager.get(level);
         Optional<VillageManager.Located> located = manager.findBuilding(markerPos);
@@ -164,6 +172,14 @@ public final class BuildingService {
             manager.putBuilding(located.get().village(), withScanTime(old, level.getGameTime()));
             return;
         }
+        if (old.isValid() && !updated.isValid() && SUSPECT.add(GlobalPos.of(level.dimension(), markerPos.immutable()))) {
+            // hotfix 1.5.1: a building that suddenly looks broken is checked once more a few seconds later
+            // (e.g. right after its chunks came back in) before villagers lose it and the owner is told
+            manager.putBuilding(located.get().village(), withScanTime(old, level.getGameTime()));
+            BuildingRescanner.scheduleRecheck(level, markerPos, BuildingRescanner.CONFIRM_DELAY_TICKS);
+            return;
+        }
+        SUSPECT.remove(GlobalPos.of(level.dimension(), markerPos.immutable()));
         manager.putBuilding(located.get().village(), updated);
         showValidity(level, markerPos, updated.isValid());
 

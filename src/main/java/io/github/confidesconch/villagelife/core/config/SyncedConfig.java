@@ -62,6 +62,24 @@ public final class SyncedConfig {
             .translation(VillageLife.MOD_ID + ".configuration.starterKit")
             .define("starterKit", true);
 
+    /** Hotfix 1.5.1: keep the villages loaded while the server runs (owner's choice "as a setting"). */
+    public static final ModConfigSpec.BooleanValue KEEP_VILLAGES_LOADED = BUILDER
+            .comment("Keep every village loaded while the server runs, also when no player is near: residents keep working,"
+                    + " fields keep growing. Costs server performance for every village.")
+            .translation(VillageLife.MOD_ID + ".configuration.keepVillagesLoaded")
+            .define("keepVillagesLoaded", false);
+
+    /** Hotfix 1.5.1 (owner's test wish): how far residents plan their paths at least, in blocks. */
+    public static final ModConfigSpec.IntValue RESIDENT_PATH_RANGE = define(ConfigDefaults.RESIDENT_PATH_RANGE,
+            "How far residents plan their paths at least, in blocks (normally fitted to the village size, up to 128)."
+                    + " Higher = residents find far and winding ways (deep tunnels, around big buildings) more often,"
+                    + " but every path search costs more server time. Measure with /villagelife debug perf.");
+
+    /** Hotfix 1.5.1: how generous the miner's ore luck is, in percent of the normal chance (owner: "a lot" = 200). */
+    public static final ModConfigSpec.IntValue MINER_ORE_LUCK_PERCENT = define(ConfigDefaults.MINER_ORE_LUCK_PERCENT,
+            "Chance for the miner to find an extra ore in every stone block he digs, in percent of the normal chance"
+                    + " (deeper = more valuable ores). 0 = off, 100 = normal, 200 = a lot.");
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     private static ModConfigSpec.IntValue define(IntOption option, String comment) {

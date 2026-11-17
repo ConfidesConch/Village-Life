@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
+import io.github.confidesconch.villagelife.core.config.SyncedConfig;
 import io.github.confidesconch.villagelife.core.util.ModProfiler;
 import io.github.confidesconch.villagelife.resident.ai.OpenFenceGateGoal;
 import io.github.confidesconch.villagelife.resident.ai.ResidentNavigation;
@@ -175,7 +176,9 @@ public class ResidentEntity extends PathfinderMob {
      * little margin, at most {@link #MAX_PATH_RANGE}. Only changes the value when needed.
      */
     public void fitPathRangeTo(int villageRadius) {
-        double wanted = Math.max(PATH_RANGE, Math.min(MAX_PATH_RANGE, villageRadius * 2.0 + 8));
+        // hotfix 1.5.1: the setting residentPathRange raises the range further (up to 256) for tests
+        double wanted = Math.max(Math.max(PATH_RANGE, Math.min(MAX_PATH_RANGE, villageRadius * 2.0 + 8)),
+                SyncedConfig.RESIDENT_PATH_RANGE.getAsInt());
         AttributeInstance range = Objects.requireNonNull(getAttribute(Attributes.FOLLOW_RANGE));
         if (range.getBaseValue() != wanted) {
             range.setBaseValue(wanted);

@@ -48,6 +48,7 @@ final class TunnelDigger {
     /** Cells that could not be walled up today (no cobblestone, out of reach): their corridor waits. */
     private final Set<Integer> waiting = new HashSet<>();
     private long day = Long.MIN_VALUE;
+    private TunnelRoute route;
     /** True if the last {@link #next} stopped at an unloaded part of the tunnel (then it is not "finished"). */
     private boolean waitingForChunks;
     private BlockPos start;
@@ -83,6 +84,7 @@ final class TunnelDigger {
         Set<Long> keys = new HashSet<>();
         plan.cells().forEach(cell -> keys.add(BlockPos.asLong(cell.x(), cell.y(), cell.z())));
         inPlan = keys;
+        route = new TunnelRoute(plan);
         sealed.clear();
         waiting.clear();
         missingTorches.clear();
@@ -241,6 +243,11 @@ final class TunnelDigger {
             miner.takeCarried(stack -> stack.is(Items.STICK), 1);
             miner.carry(new ItemStack(Items.TORCH, 4));
         }
+    }
+
+    /** Hotfix 1.5.1: the next point on the way through the tunnel to {@code target}. */
+    BlockPos waypoint(BlockPos feet, BlockPos target) {
+        return route == null ? target : route.waypoint(feet, target);
     }
 
     boolean waitingForChunks() {

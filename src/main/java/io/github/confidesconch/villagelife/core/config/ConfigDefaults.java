@@ -20,6 +20,8 @@ public final class ConfigDefaults {
     public static final IntOption VILLAGE_RADIUS = new IntOption("villageRadius", 64, 16, 256);
     public static final IntOption MAX_RESIDENTS_PER_VILLAGE = new IntOption("maxResidentsPerVillage", 100, 1, 500);
     public static final IntOption MAX_BUILDING_VOLUME = new IntOption("maxBuildingVolume", 4000, 64, 32768);
+    public static final IntOption RESIDENT_PATH_RANGE = new IntOption("residentPathRange", 48, 48, 256);
+    public static final IntOption MINER_ORE_LUCK_PERCENT = new IntOption("minerOreLuckPercent", 200, 0, 1000);
     public static final IntOption BUILDING_RESCAN_INTERVAL_SECONDS = new IntOption("buildingRescanIntervalSeconds", 60, 10, 3600);
     public static final IntOption AI_THINK_INTERVAL_TICKS = new IntOption("aiThinkIntervalTicks", 20, 5, 200);
     public static final IntOption IMMIGRATION_INTERVAL_TICKS = new IntOption("immigrationIntervalTicks", 2400, 200, 72000);

@@ -909,5 +909,14 @@
   "villagelife.problem.work.miner.tunnel_done.short": "tunnel finished",
   "villagelife.playtime.own": "Your playtime: %s",
   "villagelife.playtime.top": "Top 10 playtime (online)",
-  "villagelife.playtime.format": "%sh %smin %ss"
+  "villagelife.playtime.format": "%sh %smin %ss",
+  "villagelife.configuration.keepVillagesLoaded": "Keep villages loaded",
+  "villagelife.configuration.keepVillagesLoaded.tooltip": "Keeps every village loaded while the server runs, also without players nearby: residents keep working, fields keep growing. Costs server performance per village.",
+  "villagelife.configuration.minerOreLuckPercent": "Miner's ore luck (%)",
+  "villagelife.configuration.minerOreLuckPercent.tooltip": "Chance for an extra ore per stone block the miner digs, in percent of the normal chance (deeper = more valuable). 0 = off, 100 = normal, 200 = a lot.",
+  "villagelife.debug.perf.loading": " Keep villages loaded: %s – %s villages, %s chunks held | Residents with no player near (>128 blocks): %s of %s (counted above) | Path range at least %s blocks",
+  "villagelife.debug.keeploaded": "Keep villages loaded: %s (saved; takes effect within 10 seconds)",
+  "villagelife.debug.pathrange": "Residents now plan paths at least %s blocks far (saved; takes effect within seconds). Measure with /villagelife debug perf.",
+  "villagelife.configuration.residentPathRange": "Path range (blocks)",
+  "villagelife.configuration.residentPathRange.tooltip": "How far residents plan their paths at least. Higher = they find far and winding ways (deep tunnels, around big buildings) more often, but every path search costs more server time."
 }

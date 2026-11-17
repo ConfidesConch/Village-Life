@@ -62,6 +62,7 @@ public final class VillageLife {
         io.github.confidesconch.villagelife.convoy.ConvoySystem.init(modEventBus); // M20c
         ModRegistries.register(modEventBus);
         modEventBus.addListener(ModNetwork::onRegisterPayloads);
+        modEventBus.addListener(io.github.confidesconch.villagelife.village.VillageChunkLoader::onRegisterTicketControllers); // hotfix 1.5.1
         modEventBus.addListener(this::onCommonSetup);
 
         // Gameplay balance values: per server/world, synced to clients
@@ -74,6 +75,8 @@ public final class VillageLife {
         ProfessionSystem.init();
         NeoForge.EVENT_BUS.addListener(BuildingRescanner::onBreak);
         NeoForge.EVENT_BUS.addListener(BuildingRescanner::onPlace);
+        NeoForge.EVENT_BUS.addListener(BuildingRescanner::onChunkLoad); // hotfix 1.5.1
+        NeoForge.EVENT_BUS.addListener(io.github.confidesconch.villagelife.village.VillageChunkLoader::onServerTick);
         NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class,
                 event -> ModProfiler.time(ModProfiler.BUILDINGS, () -> BuildingRescanner.onServerTick(event)));
         NeoForge.EVENT_BUS.addListener(ServerTickEvent.Post.class,
@@ -96,6 +99,7 @@ public final class VillageLife {
         io.github.confidesconch.villagelife.profession.work.VillageGates.clear();
         io.github.confidesconch.villagelife.profession.work.HealerGoal.clear(); // M24
         io.github.confidesconch.villagelife.book.VillageBookService.clear();
+        io.github.confidesconch.villagelife.village.VillageChunkLoader.clear(); // hotfix 1.5.1
     }
 
     /** Closes the performance measurement of this tick (M12a). */

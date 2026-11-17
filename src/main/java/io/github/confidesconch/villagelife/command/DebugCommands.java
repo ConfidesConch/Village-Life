@@ -7,10 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import io.github.confidesconch.villagelife.building.BuildingSelfTest;
+import io.github.confidesconch.villagelife.core.config.ConfigDefaults;
+import io.github.confidesconch.villagelife.core.config.SyncedConfig;
 import io.github.confidesconch.villagelife.core.util.ModProfiler;
 import io.github.confidesconch.villagelife.core.util.RollingStats;
 import io.github.confidesconch.villagelife.defense.RaidService;
@@ -26,6 +29,7 @@ import io.github.confidesconch.villagelife.resident.schedule.Activity;
 import io.github.confidesconch.villagelife.resident.housing.HousingService;
 import io.github.confidesconch.villagelife.resident.schedule.ScheduleClock;
 import io.github.confidesconch.villagelife.village.Village;
+import io.github.confidesconch.villagelife.village.VillageChunkLoader;
 import io.github.confidesconch.villagelife.village.VillageManager;
 
 import net.minecraft.ChatFormatting;
@@ -42,7 +46,7 @@ final class DebugCommands {
 
     static LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands.literal("debug")
-                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(Commands.hasPermission(Commands.LEVEL_OWNERS)) // 17.11.2026: only the highest OP level (owner)
                 .then(Commands.literal("buildtests").executes(context -> {
                     CommandSourceStack source = context.getSource();
                     BlockPos start = BlockPos.containing(source.getPosition()).offset(3, 0, 3);
@@ -198,13 +202,56 @@ final class DebugCommands {
                     return 1;
                 }))
                 .then(Commands.literal("schedule").executes(context -> showSchedule(context.getSource())))
-                .then(Commands.literal("perf").executes(context -> showPerformance(context.getSource())));
+                .then(Commands.literal("perf").executes(context -> showPerformance(context.getSource())))
+                // hotfix 1.5.1: switch "keep villages loaded" and the path range for a quick A/B test (saved in the config)
+                .then(Commands.literal("keeploaded").then(Commands.argument("on", BoolArgumentType.bool()).executes(context -> {
+                    boolean on = BoolArgumentType.getBool(context, "on");
+                    SyncedConfig.KEEP_VILLAGES_LOADED.set(on);
+                    context.getSource().sendSuccess(() -> Component.translatable("villagelife.debug.keeploaded",
+                            Component.translatable(on ? "options.on" : "options.off")), true);
+                    return 1;
+                })))
+                .then(Commands.literal("pathrange").then(Commands.argument("blocks", IntegerArgumentType.integer(
+                        ConfigDefaults.RESIDENT_PATH_RANGE.min(), ConfigDefaults.RESIDENT_PATH_RANGE.max())).executes(context -> {
+                    int blocks = IntegerArgumentType.getInteger(context, "blocks");
+                    SyncedConfig.RESIDENT_PATH_RANGE.set(blocks);
+                    context.getSource().sendSuccess(() -> Component.translatable("villagelife.debug.pathrange", blocks), true);
+                    return 1;
+                })));
     }
 
     /**
      * Time per system of the mod over the last 5 seconds (M12a), the mod in total and its share of the
      * whole server tick. Target: below 2 ms per tick with 100 residents.
      */
+    /**
+     * Hotfix 1.5.1 (owner's test wish): what "keep villages loaded" holds, how many residents work with no
+     * player near (they are inside the numbers above), and the path range in use.
+     */
+    private static void showVillageLoading(CommandSourceStack source) {
+        int far = 0;
+        int all = 0;
+        for (net.minecraft.server.level.ServerLevel level : source.getServer().getAllLevels()) {
+            for (net.minecraft.world.entity.Entity entity : level.getAllEntities()) {
+                if (entity instanceof ResidentEntity resident && resident.isAlive()) {
+                    all++;
+                    if (!level.hasNearbyAlivePlayer(resident.getX(), resident.getY(), resident.getZ(), FAR_FROM_PLAYERS)) {
+                        far++;
+                    }
+                }
+            }
+        }
+        int residentsFar = far;
+        int residentsAll = all;
+        source.sendSuccess(() -> Component.translatable("villagelife.debug.perf.loading",
+                Component.translatable(SyncedConfig.KEEP_VILLAGES_LOADED.getAsBoolean() ? "options.on" : "options.off"),
+                VillageChunkLoader.heldVillages(), VillageChunkLoader.heldChunks(), residentsFar, residentsAll,
+                SyncedConfig.RESIDENT_PATH_RANGE.getAsInt()), false);
+    }
+
+    /** Residents farther than this from every player count as "working with nobody around". */
+    private static final double FAR_FROM_PLAYERS = 128;
+
     private static int showPerformance(CommandSourceStack source) {
         RollingStats residents = ModProfiler.stats().get(ModProfiler.RESIDENTS);
         source.sendSuccess(() -> Component.translatable("villagelife.debug.perf.header", residents.lastCount(),
@@ -232,6 +279,7 @@ final class DebugCommands {
                 }
             }
         });
+        showVillageLoading(source); // hotfix 1.5.1
         double totalMicros = ModProfiler.totalMicrosPerTick();
         double serverMicros = source.getServer().getAverageTickTimeNanos() / 1000.0;
         double share = serverMicros <= 0 ? 0 : 100 * totalMicros / serverMicros;

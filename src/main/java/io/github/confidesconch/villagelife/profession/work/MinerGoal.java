@@ -7,13 +7,17 @@ import java.util.Set;
 
 import io.github.confidesconch.villagelife.building.Building;
 import io.github.confidesconch.villagelife.building.BuildingType;
+import io.github.confidesconch.villagelife.core.config.SyncedConfig;
 import io.github.confidesconch.villagelife.core.registry.ModBlocks;
 import io.github.confidesconch.villagelife.resident.ResidentEntity;
 import io.github.confidesconch.villagelife.village.Village;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -59,6 +63,9 @@ public class MinerGoal extends WorkGoal {
     /** The target is an open tunnel cell to wall up, not a block to dig. */
     private boolean sealing;
     private int torchStep;
+    /** Walking progress towards the target (hotfix 1.5.1): closest distance so far and when it was reached. */
+    private double closest = Double.MAX_VALUE;
+    private int progressTicks;
 
     public MinerGoal(ResidentEntity resident, double speedModifier) {
         // basic tool: a stone pickaxe that never wears out – with wood he could not harvest iron and copper ore
@@ -146,6 +153,8 @@ public class MinerGoal extends WorkGoal {
     private void setPhase(Phase next) {
         phase = next;
         phaseTicks = 0;
+        progressTicks = 0;
+        closest = Double.MAX_VALUE;
         resetPath();
     }
 
@@ -328,7 +337,12 @@ public class MinerGoal extends WorkGoal {
             setPhase(Phase.MINE);
             return;
         }
-        if (phaseTicks > GIVE_UP_TICKS) {
+        double distance = resident.blockPosition().distSqr(target);
+        if (distance < closest - 1) { // hotfix 1.5.1: long ways (deep tunnels) are fine while he gets closer
+            closest = distance;
+            progressTicks = phaseTicks;
+        }
+        if (phaseTicks - progressTicks > GIVE_UP_TICKS) {
             if (sealing) {
                 tunnel.giveUp(target);
             }
@@ -336,7 +350,13 @@ public class MinerGoal extends WorkGoal {
             continueWork(level);
             return;
         }
-        moveTowards(target, 1);
+        BlockPos goal = inTunnel ? tunnel.waypoint(resident.blockPosition(), target) : target;
+        if (goal.equals(target)) {
+            moveTowards(target, 1);
+        } else if (resident.getNavigation().isDone() || phaseTicks % REPATH_TICKS == 1) {
+            // hotfix 1.5.1: along the tunnel, a few cells at a time
+            resident.getNavigation().moveTo(goal.getX() + 0.5, goal.getY(), goal.getZ() + 0.5, 0, speedModifier);
+        }
     }
 
     private void mine(ServerLevel level) {
@@ -363,6 +383,12 @@ public class MinerGoal extends WorkGoal {
         level.destroyBlock(target, false, resident);
         wearTool(level);
         drops.forEach(stack -> keepOrDrop(level, stack));
+        if (state.is(BlockTags.BASE_STONE_OVERWORLD)) { // hotfix 1.5.1: a little ore luck, better the deeper
+            String ore = OreLuck.roll(target.getY(), level.getRandom().nextDouble(), SyncedConfig.MINER_ORE_LUCK_PERCENT.getAsInt());
+            if (ore != null) {
+                keepOrDrop(level, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(ore))));
+            }
+        }
         continueWork(level);
     }
 

@@ -909,5 +909,14 @@
   "villagelife.problem.work.miner.tunnel_done.short": "Stollen fertig",
   "villagelife.playtime.own": "Deine Spielzeit: %s",
   "villagelife.playtime.top": "Top 10 Spielzeit (online)",
-  "villagelife.playtime.format": "%sh %smin %ss"
+  "villagelife.playtime.format": "%sh %smin %ss",
+  "villagelife.configuration.keepVillagesLoaded": "Dörfer immer geladen",
+  "villagelife.configuration.keepVillagesLoaded.tooltip": "Hält jedes Dorf geladen, solange der Server läuft – auch ohne Spieler in der Nähe: Bewohner arbeiten weiter, Felder wachsen. Kostet Serverleistung pro Dorf.",
+  "villagelife.configuration.minerOreLuckPercent": "Erz-Glück des Bergarbeiters (%)",
+  "villagelife.configuration.minerOreLuckPercent.tooltip": "Chance auf ein zusätzliches Erz pro abgebautem Steinblock, in Prozent der normalen Chance (je tiefer, desto wertvoller). 0 = aus, 100 = normal, 200 = viel.",
+  "villagelife.debug.perf.loading": " Dörfer immer geladen: %s – %s Dörfer, %s Chunks gehalten | Bewohner ohne Spieler in der Nähe (>128 Blöcke): %s von %s (sind oben mitgezählt) | Wegsuche mindestens %s Blöcke",
+  "villagelife.debug.keeploaded": "Dörfer immer geladen: %s (gespeichert; wirkt in spätestens 10 Sekunden)",
+  "villagelife.debug.pathrange": "Wegsuche der Bewohner jetzt mindestens %s Blöcke (gespeichert; wirkt in wenigen Sekunden). Messen mit /villagelife debug perf.",
+  "villagelife.configuration.residentPathRange": "Reichweite der Wegsuche (Blöcke)",
+  "villagelife.configuration.residentPathRange.tooltip": "Wie weit Bewohner ihre Wege mindestens planen. Höher = finden weite, verwinkelte Wege (tiefe Stollen, um große Gebäude) öfter, jede Wegsuche kostet aber mehr Serverzeit."
 }

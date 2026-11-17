@@ -1,8 +1,11 @@
 package io.github.confidesconch.villagelife.building;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.github.confidesconch.villagelife.core.config.SyncedConfig;
 import io.github.confidesconch.villagelife.core.util.DueQueue;
@@ -11,8 +14,10 @@ import io.github.confidesconch.villagelife.village.VillageManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -34,10 +39,46 @@ public final class BuildingRescanner {
     /** Hard cap of scans per tick, in addition to the time budget. */
     private static final int MAX_SCANS_PER_TICK = 8;
 
+    /** After a chunk with buildings comes back in, check them once it has settled (5 s, hotfix 1.5.1). */
+    private static final long LOAD_DELAY_TICKS = 100;
+    /** A building that suddenly looks broken is checked once more before it counts as invalid (hotfix 1.5.1). */
+    static final long CONFIRM_DELAY_TICKS = 100;
+
     private static final Map<ResourceKey<Level>, DueQueue<BlockPos>> QUEUES = new HashMap<>();
+    /** Chunks that were loaded since the last server tick, per dimension. */
+    private static final Map<ResourceKey<Level>, Set<Long>> LOADED_CHUNKS = new ConcurrentHashMap<>();
 
     public static void clear() {
         QUEUES.clear();
+        LOADED_CHUNKS.clear();
+        BuildingService.clearSuspects();
+    }
+
+    /** Hotfix 1.5.1: buildings in a chunk that was just loaded again are rechecked shortly after. */
+    public static void onChunkLoad(ChunkEvent.Load event) {
+        if (event.getLevel() instanceof ServerLevel level) {
+            LOADED_CHUNKS.computeIfAbsent(level.dimension(), key -> ConcurrentHashMap.newKeySet()).add(event.getChunk().getPos().pack());
+        }
+    }
+
+    /** Checks the building again after {@code delayTicks} (used to confirm that it really became invalid). */
+    static void scheduleRecheck(ServerLevel level, BlockPos markerPos, long delayTicks) {
+        QUEUES.computeIfAbsent(level.dimension(), key -> new DueQueue<>()).add(markerPos, level.getGameTime() + delayTicks);
+    }
+
+    private static void queueReloaded(ServerLevel level) {
+        Set<Long> chunks = LOADED_CHUNKS.get(level.dimension());
+        if (chunks == null || chunks.isEmpty()) {
+            return;
+        }
+        Set<Long> loaded = new HashSet<>(chunks);
+        chunks.removeAll(loaded);
+        for (VillageManager.Located located : VillageManager.get(level).allBuildings()) {
+            BlockPos marker = located.building().markerPos();
+            if (loaded.contains(ChunkPos.pack(marker.getX() >> 4, marker.getZ() >> 4))) {
+                scheduleRecheck(level, marker, LOAD_DELAY_TICKS);
+            }
+        }
     }
 
     public static void forget(ServerLevel level, BlockPos markerPos) {
@@ -75,6 +116,7 @@ public final class BuildingRescanner {
         int scans = 0;
         for (ServerLevel level : event.getServer().getAllLevels()) {
             long now = level.getGameTime();
+            queueReloaded(level);
             DueQueue<BlockPos> queue = QUEUES.get(level.dimension());
             // 1) buildings changed by players
             while (queue != null && scans < MAX_SCANS_PER_TICK && System.nanoTime() < deadline) {

@@ -2,7 +2,7 @@
 
 > A Minecraft mod where you **build your village yourself** – and residents **live** in it.
 
-**Version:** 1.5.0 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
+**Version:** 1.5.1 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
 
 ---
 
@@ -66,7 +66,7 @@ noticeable lag.
 ## Installation
 
 1. Install Minecraft Java Edition **26.3** with **NeoForge 26.3.0.100** or newer (26.3.x).
-2. Put `villagelife-26.3-1.5.0.jar` into the `mods` folder – on the server **and** on every player's game.
+2. Put `villagelife-26.3-1.5.1.jar` into the `mods` folder – on the server **and** on every player's game.
 3. Start the game. The village center and building markers are in the creative tab "Village Life" and can be
    crafted in survival:
    - **Village center:** planks in the corners, cobblestone (or other stone) on the sides, paper in the middle.
