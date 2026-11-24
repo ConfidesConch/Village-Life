@@ -53,6 +53,19 @@ public final class MapImage {
         return size;
     }
 
+    /** World centre of the picture (after {@link #panTo} snapped to whole pixels). */
+    public double centerX() {
+        return centerX;
+    }
+
+    public double centerZ() {
+        return centerZ;
+    }
+
+    public float scale() {
+        return scale;
+    }
+
     /** Sets what the picture shows: centre in world coordinates and blocks per pixel. */
     public void view(double centerX, double centerZ, float blocksPerPixel) {
         boolean jump = Math.abs(centerX - this.centerX) > size * scale / 4 || Math.abs(centerZ - this.centerZ) > size * scale / 4

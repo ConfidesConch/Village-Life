@@ -149,7 +149,48 @@ public final class MapOverlay {
         for (ResidentEntity resident : minecraft.level.getEntitiesOfClass(ResidentEntity.class, box)) {
             dot(g, map, x, y, scaledSize, resident.getX(), resident.getZ(), 2, RESIDENT);
         }
-        dot(g, map, x, y, scaledSize, player.getX(), player.getZ(), 3, PLAYER);
+        // 1.6 (owner's wish): an arrow that points where the player looks, instead of a dot
+        float arrowScale = (float) scaledSize / map.size();
+        float px = x + map.pixelX(player.getX()) * arrowScale;
+        float pz = y + map.pixelZ(player.getZ()) * arrowScale;
+        if (px >= x && pz >= y && px < x + scaledSize && pz < y + scaledSize) {
+            arrow(g, px, pz, headingOf(player.getYRot()));
+        }
+    }
+
+    /**
+     * The angle (radians, clockwise on screen) from "north up" to the way a player with yaw {@code yRot}
+     * looks; Minecraft's yaw 180 is north.
+     */
+    public static float headingOf(float yRot) {
+        return (float) Math.toRadians(yRot - 180.0);
+    }
+
+    /** The player's arrow (white with a dark rim), pointing up turned by {@code angle}, centred on (cx, cy). */
+    public static void arrow(GuiGraphicsExtractor g, float cx, float cy, float angle) {
+        var pose = g.pose();
+        pose.pushMatrix();
+        pose.translate(cx, cy);
+        pose.rotate(angle);
+        arrowShape(g, 1, ARROW_RIM);
+        arrowShape(g, 0, PLAYER);
+        pose.popMatrix();
+    }
+
+    private static final int ARROW_RIM = 0xFF202020;
+
+    /** Rows from the tip down: a triangle 9 high with a notch at the back; {@code grow} widens it (rim). */
+    private static void arrowShape(GuiGraphicsExtractor g, int grow, int color) {
+        for (int row = -grow; row < 9 + grow; row++) {
+            int y = row - 4;
+            int half = Math.max(0, row) / 2 + grow;
+            if (row >= 7) { // the notch: two feet left and right
+                g.fill(-half, y, -1 + grow, y + 1, color);
+                g.fill(2 - grow, y, half + 1, y + 1, color);
+            } else {
+                g.fill(-half, y, half + 1, y + 1, color);
+            }
+        }
     }
 
     /** The village's zones (M11e): translucent rectangles with outline and, if there is room, the name. */

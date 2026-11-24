@@ -2,7 +2,7 @@
 
 > A Minecraft mod where you **build your village yourself** – and residents **live** in it.
 
-**Version:** 1.5.1.1 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
+**Version:** 1.6.0 · **Minecraft Java Edition 26.3** with **NeoForge** · **License:** LGPL-3.0
 
 ---
 
@@ -57,7 +57,9 @@ find work, follow a daily routine, make friends, start families – and turn you
 **Village window** (key **B**)
 - Overview with problems and events, residents, jobs, buildings, economy, a parchment-style map that remembers
   explored areas, defence, administration and your character – everything in one place.
-- Right-click a resident or a building sign and the window jumps right to it.
+- Right-click a resident or a building sign and the window jumps right to it. You can keep walking while it is open.
+- Minimap (key **N**) in the same parchment style: press **U** to move, resize, zoom it or let it turn with you;
+  you are an arrow pointing where you look.
 - `/playtime` and `/playtime top` show how long you (and the others online) have played.
 
 **Multiplayer** and dedicated servers are supported from the start. 100+ residents per village run without
@@ -66,7 +68,7 @@ noticeable lag.
 ## Installation
 
 1. Install Minecraft Java Edition **26.3** with **NeoForge 26.3.0.100** or newer (26.3.x).
-2. Put `villagelife-26.3-1.5.1.1.jar` into the `mods` folder – on the server **and** on every player's game.
+2. Put `villagelife-26.3-1.6.0.jar` into the `mods` folder – on the server **and** on every player's game.
 3. Start the game. The village center and building markers are in the creative tab "Village Life" and can be
    crafted in survival:
    - **Village center:** planks in the corners, cobblestone (or other stone) on the sides, paper in the middle.

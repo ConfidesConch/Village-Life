@@ -21,4 +21,8 @@ public final class VillageBookKeys {
     /** Shows or hides the minimap; default N. */
     public static final KeyMapping TOGGLE_MINIMAP =
             new KeyMapping("key.villagelife.toggle_minimap", InputConstants.KEY_N, CATEGORY);
+
+    /** Unlocks the minimap to move, resize and zoom it (1.6); default U. */
+    public static final KeyMapping EDIT_MINIMAP =
+            new KeyMapping("key.villagelife.edit_minimap", InputConstants.KEY_U, CATEGORY);
 }

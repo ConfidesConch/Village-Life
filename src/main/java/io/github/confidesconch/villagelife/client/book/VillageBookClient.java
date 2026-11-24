@@ -12,6 +12,7 @@ import io.github.confidesconch.villagelife.client.map.ClientFriends;
 import io.github.confidesconch.villagelife.friend.FriendPositionsPayload;
 import io.github.confidesconch.villagelife.friend.FriendSyncPayload;
 import io.github.confidesconch.villagelife.client.map.ClientWaypoints;
+import io.github.confidesconch.villagelife.client.map.MinimapEditScreen;
 import io.github.confidesconch.villagelife.client.map.MinimapLayer;
 import io.github.confidesconch.villagelife.core.config.ClientConfig;
 import io.github.confidesconch.villagelife.waypoint.WaypointSyncPayload;
@@ -53,6 +54,7 @@ public final class VillageBookClient {
         event.registerCategory(VillageBookKeys.CATEGORY);
         event.register(VillageBookKeys.OPEN_BOOK);
         event.register(VillageBookKeys.TOGGLE_MINIMAP);
+        event.register(VillageBookKeys.EDIT_MINIMAP); // 1.6
     }
 
     private static void onRegisterPayloadHandlers(RegisterClientPayloadHandlersEvent event) {
@@ -72,6 +74,11 @@ public final class VillageBookClient {
         while (VillageBookKeys.TOGGLE_MINIMAP.consumeClick()) {
             ClientConfig.SHOW_MINIMAP.set(!ClientConfig.SHOW_MINIMAP.get());
             ClientConfig.SHOW_MINIMAP.save();
+        }
+        while (VillageBookKeys.EDIT_MINIMAP.consumeClick()) {
+            if (minecraft.player != null && minecraft.gui.screen() == null) {
+                minecraft.gui.setScreen(new MinimapEditScreen()); // 1.6: unlocked minimap
+            }
         }
         while (VillageBookKeys.OPEN_BOOK.consumeClick()) {
             if (minecraft.player != null && minecraft.gui.screen() == null) {

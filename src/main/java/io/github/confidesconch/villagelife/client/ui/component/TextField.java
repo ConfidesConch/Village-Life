@@ -20,6 +20,8 @@ public final class TextField {
     private final int maxLength;
     private String value = "";
     private boolean focused;
+    /** The field that has the focus right now, if any (1.6: walking pauses while one is typed into). */
+    private static TextField current;
 
     public TextField(int maxLength) {
         this.maxLength = maxLength;
@@ -37,6 +39,11 @@ public final class TextField {
         return focused;
     }
 
+    /** True while any text field has the focus: then the movement keys are text, not walking (1.6). */
+    public static boolean anyFocused() {
+        return current != null && current.focused;
+    }
+
     public void blur() {
         setFocused(false);
     }
@@ -50,6 +57,11 @@ public final class TextField {
             return;
         }
         focused = focus;
+        if (focus) {
+            current = this;
+        } else if (current == this) {
+            current = null;
+        }
         var input = Minecraft.getInstance().textInputManager();
         if (focus) {
             input.startTextInput(this);

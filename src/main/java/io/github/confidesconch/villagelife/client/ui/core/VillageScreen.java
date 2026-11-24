@@ -8,6 +8,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import io.github.confidesconch.villagelife.book.VillageBookMenu;
 import io.github.confidesconch.villagelife.book.VillageSectionRequestPayload;
 import io.github.confidesconch.villagelife.client.book.VillageBookKeys;
+import io.github.confidesconch.villagelife.client.ui.component.TextField;
 import io.github.confidesconch.villagelife.core.config.ClientConfig;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -254,6 +255,7 @@ public class VillageScreen extends AbstractContainerScreen<VillageBookMenu> {
     @Override
     protected void containerTick() {
         super.containerTick();
+        WalkWhileOpen.update(TextField.anyFocused()); // 1.6: walk with the window open
         String focus = data().getStringOr("focus_page", "");
         if (!focus.isEmpty()) { // M21b10b: opened by a right click on a resident, a building marker or the village center
             data().remove("focus_page");
@@ -356,6 +358,7 @@ public class VillageScreen extends AbstractContainerScreen<VillageBookMenu> {
         if (page != null) {
             page.blur(); // switches text input off again (M21b4)
         }
+        WalkWhileOpen.release();
         super.removed();
     }
 
